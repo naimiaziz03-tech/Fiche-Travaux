@@ -168,10 +168,13 @@ function setCell(xml,ref,val,style){
 function setCalc(xml,ref,v){
   return xml.replace(new RegExp('(<c r="'+ref+'"[^>]*>\\s*<f>[^<]*</f>\\s*<v>)[^<]*(</v>)'),'$1'+v+'$2');
 }
-function hrs(D){if(isC(D))return 0;let s=0;for(let i=0;i<8;i+=2){const a=D['t'+i],b=D['t'+(i+1)];if(a&&b){let x=(+b.slice(0,2))*60+(+b.slice(3,5))-((+a.slice(0,2))*60+(+a.slice(3,5)));if(x<0)x+=1440;s+=x}}return rd(s/60)}
+function hrs(D){if(isC(D))return 0;let s=0;for(let i=0;i<8;i+=2){const a=g(D,i),b=g(D,i+1);if(a&&b){let x=(+b.slice(0,2))*60+(+b.slice(3,5))-((+a.slice(0,2))*60+(+a.slice(3,5)));if(x<0)x+=1440;s+=x}}return rd(s/60)}
 const fh=t=>t?String(t).replace(':','h'):'';
-const isC=D=>/conge\s*an+u[ae]?l/.test(String(D.w||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase());
-const tt=(D,i)=>isC(D)&&i<2?(i?'A':'C'):fh(D['t'+i]);
+const SP=[[/conge\s*an+u[ae]?l/,'C','A'],[/repos\s*statut/,'R','S'],[/repos\s*compens/,'R','C'],[/jour\s*feri/,'J','F'],[/travaux\s*au\s*centre/,'08h00','16h30',1]];
+const spc=D=>{const s=String(D.w||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return SP.find(p=>p[0].test(s))||null};
+const isC=D=>{const p=spc(D);return !!p&&!p[3]};
+const tt=(D,i)=>{const p=spc(D);return p&&i<2?p[i+1]:fh(D['t'+i])};
+const g=(D,i)=>{const p=spc(D);return p&&p[3]&&i<2?(i?'16:30':'08:00'):D['t'+i]};
 function has(D){return Object.keys(D).some(k=>D[k])}
 function fillSheet(xml,y,m,days,ex,set){
   const n=new Date(y,m+1,0).getDate(),T={K:0,L:0,M:0,R:0,S:0,T:0,U:0};
@@ -181,7 +184,7 @@ function fillSheet(xml,y,m,days,ex,set){
     xml=setCell(xml,'B'+r,ok?DOW[w]:'',ok&&(w===0||w===6)?36:26);
     'CDEFGHIJ'.split('').forEach((c,i)=>{xml=setCell(xml,c+r,tt(D,i))});
     const kv=hrs(D);if(kv)T.K+=kv;xml=setCell(xml,'K'+r,kv||'');
-    const lv=hrs(D)?rd(hrs(D)*(w===0?1.75:1.5)):0;if(lv)T.L+=lv;xml=setCell(xml,'L'+r,lv||'');
+    const lv=hrs(D)?rd(hrs(D)*(spc(D)&&spc(D)[3]?1:(w===0?1.75:1.5))):0;if(lv)T.L+=lv;xml=setCell(xml,'L'+r,lv||'');
     const pv=D.m?1:0;if(pv)T.M+=pv;xml=setCell(xml,'M'+r,pv||'');
     xml=setCell(xml,'N'+r,D.w||'');
     const q=num(D.q);xml=setCell(xml,'Q'+r,q==null?(D.q||''):q);
@@ -214,7 +217,7 @@ const ls={
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 };
 const mk=()=>'ft:'+st.y+'-'+st.m;
-const nmv=(d,D)=>rd(hrs(D)*(new Date(st.y,st.m,+d).getDay()===0?1.75:1.5));
+const nmv=(d,D)=>rd(hrs(D)*(spc(D)&&spc(D)[3]?1:(new Date(st.y,st.m,+d).getDay()===0?1.75:1.5)));
 function load(){const d=ls.get(mk())||{};st.days=d.days||{};st.ex=d.ex||{};
   document.querySelectorAll('[data-ex]').forEach(i=>{i.value=st.ex[i.dataset.ex]||''});}
 function save(){ls.set(mk(),{days:st.days,ex:st.ex});ls.set('ft:set',st.set);}
@@ -235,8 +238,8 @@ function form(d){const D=st.days[d]||{};
 <h4>Déplacement</h4>
 <div class="cks" dir="ltr">${chk(d,'c1','P.Déj')}${chk(d,'c2','Déj')}${chk(d,'c3','Din')}${chk(d,'c4','Déc')}</div>
 <div class="act"><button data-act="cp">نسخ من اليوم السابق</button></div></div>`;}
-function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);if(isC(D))p.push('C–A');
-  for(let i=0;i<8;i+=2)if(!isC(D)&&D['t'+i]&&D['t'+(i+1)])p.push(fh(D['t'+i])+'–'+fh(D['t'+(i+1)]));
+function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);{const q=spc(D);if(q&&!q[3])p.push(q[1]+'–'+q[2]);}
+  for(let i=0;i<8;i+=2)if(!isC(D)&&tt(D,i)&&tt(D,i+1))p.push(tt(D,i)+'–'+tt(D,i+1));
   if(D.m)p.push('Panier');
   
   
