@@ -24,6 +24,13 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,-apple-system,"Noto Naskh Arabic",Tahoma,sans-serif}
 main{max-width:640px;margin:0 auto;padding:16px 14px 24px}
+.top{display:flex;align-items:center;gap:10px;position:relative;margin:6px 0 2px}
+.top h1{margin:0}
+.ic{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);padding:0}
+#menu{position:absolute;top:100%;inset-inline-start:0;z-index:15;margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;min-width:230px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#menu[hidden],#toast[hidden]{display:none}
+#menu button{display:block;width:100%;text-align:start;padding:11px 12px;border:0;background:none;color:var(--ink);border-radius:8px}
+#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:14px;z-index:30}
 h1{font-size:22px;margin:6px 0 2px}
 .sub{color:var(--mut);margin:0 0 14px;font-size:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
@@ -78,7 +85,10 @@ button{font:inherit;cursor:pointer}
 </head>
 <body>
 <main>
-<h1>Fiche de travaux</h1>
+<div class="top"><button id="mn" class="ic" aria-label="menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1>Fiche de travaux</h1>
+<div id="menu" hidden><button id="mx">إرسال / حفظ نسخة كاملة للمعلومات</button><button id="mi">استرجاع نسخة</button></div></div>
+<input type="file" id="imf" accept=".json,application/json" hidden>
+<div id="toast" hidden></div>
 <p class="sub">أدخل معلومات كل يوم، والتطبيق يملأ لك ملف Excel بنفس تنسيق نموذجك.</p>
 
 <section class="card row">
@@ -158,8 +168,10 @@ function setCell(xml,ref,val,style){
 function setCalc(xml,ref,v){
   return xml.replace(new RegExp('(<c r="'+ref+'"[^>]*>\\s*<f>[^<]*</f>\\s*<v>)[^<]*(</v>)'),'$1'+v+'$2');
 }
-function hrs(D){let s=0;for(let i=0;i<8;i+=2){const a=D['t'+i],b=D['t'+(i+1)];if(a&&b){let x=(+b.slice(0,2))*60+(+b.slice(3,5))-((+a.slice(0,2))*60+(+a.slice(3,5)));if(x<0)x+=1440;s+=x}}return rd(s/60)}
+function hrs(D){if(isC(D))return 0;let s=0;for(let i=0;i<8;i+=2){const a=D['t'+i],b=D['t'+(i+1)];if(a&&b){let x=(+b.slice(0,2))*60+(+b.slice(3,5))-((+a.slice(0,2))*60+(+a.slice(3,5)));if(x<0)x+=1440;s+=x}}return rd(s/60)}
 const fh=t=>t?String(t).replace(':','h'):'';
+const isC=D=>/conge\s*an+u[ae]?l/.test(String(D.w||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase());
+const tt=(D,i)=>isC(D)&&i<2?(i?'A':'C'):fh(D['t'+i]);
 function has(D){return Object.keys(D).some(k=>D[k])}
 function fillSheet(xml,y,m,days,ex,set){
   const n=new Date(y,m+1,0).getDate(),T={K:0,L:0,M:0,R:0,S:0,T:0,U:0};
@@ -167,7 +179,7 @@ function fillSheet(xml,y,m,days,ex,set){
     const r=12+d,ok=d<=n,w=new Date(y,m,d).getDay(),D=ok?(days[d]||{}):{};
     xml=setCell(xml,'A'+r,ok?String(d):'');
     xml=setCell(xml,'B'+r,ok?DOW[w]:'',ok&&(w===0||w===6)?36:26);
-    'CDEFGHIJ'.split('').forEach((c,i)=>{xml=setCell(xml,c+r,fh(D['t'+i]))});
+    'CDEFGHIJ'.split('').forEach((c,i)=>{xml=setCell(xml,c+r,tt(D,i))});
     const kv=hrs(D);if(kv)T.K+=kv;xml=setCell(xml,'K'+r,kv||'');
     const lv=hrs(D)?rd(hrs(D)*(w===0?1.75:1.5)):0;if(lv)T.L+=lv;xml=setCell(xml,'L'+r,lv||'');
     const pv=D.m?1:0;if(pv)T.M+=pv;xml=setCell(xml,'M'+r,pv||'');
@@ -223,8 +235,8 @@ function form(d){const D=st.days[d]||{};
 <h4>Déplacement</h4>
 <div class="cks" dir="ltr">${chk(d,'c1','P.Déj')}${chk(d,'c2','Déj')}${chk(d,'c3','Din')}${chk(d,'c4','Déc')}</div>
 <div class="act"><button data-act="cp">نسخ من اليوم السابق</button></div></div>`;}
-function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);
-  for(let i=0;i<8;i+=2)if(D['t'+i]&&D['t'+(i+1)])p.push(fh(D['t'+i])+'–'+fh(D['t'+(i+1)]));
+function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);if(isC(D))p.push('C–A');
+  for(let i=0;i<8;i+=2)if(!isC(D)&&D['t'+i]&&D['t'+(i+1)])p.push(fh(D['t'+i])+'–'+fh(D['t'+(i+1)]));
   if(D.m)p.push('Panier');
   
   
@@ -259,7 +271,7 @@ function preview(){
   for(let d=1;d<=n;d++){
     const D=st.days[d]||{},w=new Date(st.y,st.m,d).getDay(),h=hrs(D),l=h?nmv(d,D):0;
     T.k+=h;T.l+=l;if(D.m)T.m++;C.forEach(c=>{if(D[c])T[c]++});
-    rows+='<tr class="'+(w===0||w===6?'we':'')+'"><td>'+d+'</td><td>'+DOW[w]+'</td>'+[0,1,2,3,4,5,6,7].map(i=>'<td>'+esc(fh(D['t'+i]))+'</td>').join('')+'<td>'+(h||'')+'</td><td>'+(l||'')+'</td><td>'+(D.m?1:'')+'</td><td class="tw">'+esc(D.w||'')+'</td><td>'+esc(D.q||'')+'</td>'+C.map(c=>'<td>'+(D[c]?1:'')+'</td>').join('')+'</tr>';
+    rows+='<tr class="'+(w===0||w===6?'we':'')+'"><td>'+d+'</td><td>'+DOW[w]+'</td>'+[0,1,2,3,4,5,6,7].map(i=>'<td>'+esc(tt(D,i))+'</td>').join('')+'<td>'+(h||'')+'</td><td>'+(l||'')+'</td><td>'+(D.m?1:'')+'</td><td class="tw">'+esc(D.w||'')+'</td><td>'+esc(D.q||'')+'</td>'+C.map(c=>'<td>'+(D[c]?1:'')+'</td>').join('')+'</tr>';
   }
   const th=s=>'<th>'+s+'</th>';
   const head='<tr>'+th('Date')+th('Jour')+'<th colspan="4">Jour (5h–21h)</th><th colspan="4">Nuit (21h–5h)</th>'+th('NM')+th('M')+th('Panier')+th('Travaux effectués')+th('Frais')+'<th colspan="4">Déplacement</th></tr><tr>'+th('')+th('')+['de','à','de','à','de','à','de','à'].map(x=>th(x)).join('')+th('')+th('')+th('')+th('')+th('')+['P.Déj','Déj','Din','Déc'].map(x=>th(x)).join('')+'</tr>';
@@ -269,6 +281,38 @@ function preview(){
   $('#pv').hidden=false;
 }
 $('#pvb').addEventListener('click',preview);$('#pvx').addEventListener('click',()=>{$('#pv').hidden=true});
+
+function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.hidden=true},2800);}
+$('#mn').addEventListener('click',()=>{$('#menu').hidden=!$('#menu').hidden});
+document.addEventListener('click',e=>{if(!e.target.closest('#menu,#mn'))$('#menu').hidden=true});
+async function saveBlob(blob,fn){
+  const dl=window.claude?await window.claude.use('downloads'):null;
+  if(dl){await dl.save({filename:fn,data:blob});}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();}
+}
+$('#mx').addEventListener('click',async()=>{
+  $('#menu').hidden=true;
+  const o={app:'fiche-travaux',v:1,at:new Date().toISOString(),data:{}};
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ft:'))o.data[k]=JSON.parse(localStorage.getItem(k));}}catch(e){}
+  const blob=new Blob([JSON.stringify(o)],{type:'application/json'});
+  const fn='Fiche_sauvegarde_'+new Date().toISOString().slice(0,10)+'.json';
+  try{
+    const f=new File([blob],fn,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Fiche de travaux'});return;}
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  try{await saveBlob(blob,fn);toast('تم حفظ النسخة ✓');}catch(e){toast(e&&e.code==='declined'?'أُلغي الحفظ':'تعذّر حفظ النسخة');}
+});
+$('#mi').addEventListener('click',()=>{$('#menu').hidden=true;$('#imf').click();});
+$('#imf').addEventListener('change',async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{
+    const o=JSON.parse(await f.text());if(o.app!=='fiche-travaux'||!o.data)throw 0;
+    Object.keys(o.data).forEach(k=>{if(k.startsWith('ft:'))ls.set(k,o.data[k]);});
+    st.set={...DEF,...(ls.get('ft:set')||{})};
+    document.querySelectorAll('[data-set]').forEach(i=>{i.value=st.set[i.dataset.set]||''});
+    st.open=0;load();render();toast('تم الاسترجاع ✓');
+  }catch(err){toast('ملف غير صالح');}
+});
 
 async function makeXlsx(){
   const zip=await JSZip.loadAsync(TPL,{base64:true});
