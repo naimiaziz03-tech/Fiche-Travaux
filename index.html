@@ -42,7 +42,7 @@ details .g2,details .g3{margin-top:10px}
 .dh b{font-size:18px;min-width:26px}
 .dh i{font-style:normal;font-weight:700;min-width:26px;text-align:center;border-radius:6px;padding:0 6px;background:var(--bg)}
 .we .dh i{color:var(--red)}
-.dh span{flex:1;color:var(--mut);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:auto}
+.dh span{flex:1;color:var(--mut);font-size:13px;white-space:normal;word-break:break-word}
 .fm{padding:4px 12px 14px;border-top:1px dashed var(--line)}
 .fm h4{margin:12px 0 6px;font-size:13px}
 .fm label+label,.fm .g2+label{margin-top:8px}
@@ -58,6 +58,20 @@ button{font:inherit;cursor:pointer}
 #dl{background:var(--acc);color:var(--accink);border:0;border-radius:12px;padding:12px 16px;font-weight:700}
 #dl:disabled{opacity:.6}
 .g3 .ck{margin-top:24px}details.sub{margin-top:10px}.fm details summary{font-size:13px;color:var(--mut)}
+.fm details.p2>summary{width:fit-content;border:1px solid var(--line);border-radius:10px;padding:6px 12px;background:var(--card);color:var(--ink)}
+#pvb{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px}
+#pv{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+#pv[hidden]{display:none}
+.pvh{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--card)}
+.pvh button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 14px}
+.pvi{font-size:12px;padding:8px 14px;color:var(--mut);direction:ltr;text-align:left}
+#pvt{flex:1;overflow:auto;padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}
+#pvt table{border-collapse:collapse;font-size:12px;min-width:780px;direction:ltr;background:var(--card)}
+#pvt th,#pvt td{border:1px solid var(--line);padding:4px 6px;text-align:center;white-space:nowrap}
+#pvt th{background:var(--bg);font-weight:600}
+#pvt td.tw{white-space:normal;min-width:150px;text-align:start}
+#pvt tr.we td:nth-child(2){color:var(--red);font-weight:700}
+#pvt tr.tot td{font-weight:700;background:var(--bg)}
 .note{font-size:12.5px;color:var(--mut);margin:4px 2px 12px}
 .ckrow{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink)}
 </style>
@@ -105,8 +119,10 @@ button{font:inherit;cursor:pointer}
 
 <footer class="bar">
 <div id="tot"></div>
+<button id="pvb">عرض الملف</button>
 <button id="dl">تنزيل ملف Excel</button>
 </footer>
+<div id="pv" hidden><div class="pvh"><b>معاينة الملف</b><button id="pvx">إغلاق</button></div><div class="pvi" id="pvi"></div><div id="pvt"></div></div>
 
 <script>/*!
 
@@ -195,21 +211,23 @@ function inp(d,k,type,lab,att){const v=(st.days[d]||{})[k]??'';
   return `<label>${lab}<input data-d="${d}" data-k="${k}" type="${type}" dir="ltr" value="${esc(v)}" ${att||''}></label>`;}
 function chk(d,k,lab){const v=(st.days[d]||{})[k];
   return `<label class="ck"><input data-d="${d}" data-k="${k}" type="checkbox" ${v?'checked':''}>${lab}</label>`;}
+function p2(d,a,b){const D=st.days[d]||{};return `<details class="sub p2"${D[a]||D[b]?' open':''}><summary>+ فترة ثانية</summary><div class="g4" style="margin-top:8px">${inp(d,a,'time','de')}${inp(d,b,'time','à')}</div></details>`;}
 function form(d){const D=st.days[d]||{};
   return `<div class="fm">
-<h4>النهار · Jour (5h–21h)</h4><div class="g4">${inp(d,'t0','time','de')}${inp(d,'t1','time','à')}${inp(d,'t2','time','de')}${inp(d,'t3','time','à')}</div>
-<details class="sub"${D.t4||D.t5||D.t6||D.t7?' open':''}><summary>الليل · Nuit (21h–5h)</summary><div class="g4" style="margin-top:8px">${inp(d,'t4','time','de')}${inp(d,'t5','time','à')}${inp(d,'t6','time','de')}${inp(d,'t7','time','à')}</div></details>
+<label>Travaux effectués<textarea data-d="${d}" data-k="w" rows="2" dir="auto">${esc(D.w||'')}</textarea></label>
+<h4>النهار · Jour (5h–21h)</h4><div class="g4">${inp(d,'t0','time','de')}${inp(d,'t1','time','à')}</div>${p2(d,'t2','t3')}
+<details class="sub"${D.t4||D.t5||D.t6||D.t7?' open':''}><summary>الليل · Nuit (21h–5h)</summary><div class="g4" style="margin-top:8px">${inp(d,'t4','time','de')}${inp(d,'t5','time','à')}</div>${p2(d,'t6','t7')}</details>
 <h4>الساعات · Total HS / Panier</h4><div class="g3"><label>NM (تلقائي)<input id="nm${d}" readonly dir="ltr" value="${hrs(D)||''}"></label><label>M (تلقائي)<input id="mh${d}" readonly dir="ltr" value="${hrs(D)?nmv(d,D):''}"></label>${chk(d,'m','Panier')}</div>
-<h4>الأشغال المنجزة</h4><label>Travaux effectués<textarea data-d="${d}" data-k="w" rows="2" dir="auto">${esc(D.w||'')}</textarea></label>
+
 <details class="sub"${D.q?' open':''}><summary>Frais de voyage</summary><div style="margin-top:8px">${inp(d,'q','number','المبلغ','step="0.01" min="0" inputmode="decimal"')}</div></details>
-<h4>التنقل · Déplacement</h4>
+<h4>Déplacement</h4>
 <div class="cks" dir="ltr">${chk(d,'c1','P.Déj')}${chk(d,'c2','Déj')}${chk(d,'c3','Din')}${chk(d,'c4','Déc')}</div>
-<div class="act"><button data-act="cp">نسخ من اليوم السابق</button><button data-act="clr" class="gh">مسح اليوم</button></div></div>`;}
-function sum(d){const D=st.days[d]||{},p=[];
-  for(let i=0;i<8;i+=2)if(D['t'+i]&&D['t'+(i+1)])p.push(D['t'+i]+'–'+D['t'+(i+1)]);
+<div class="act"><button data-act="cp">نسخ من اليوم السابق</button></div></div>`;}
+function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);
+  for(let i=0;i<8;i+=2)if(D['t'+i]&&D['t'+(i+1)])p.push(fh(D['t'+i])+'–'+fh(D['t'+(i+1)]));
   const hs=hrs(D);if(hs)p.push('NM '+hs+'h · M '+nmv(d,D));if(D.m)p.push('Panier');
   if(D.c1||D.c2||D.c3||D.c4)p.push('تنقل');
-  if(D.w)p.push(D.w.slice(0,24));
+  
   return p.join(' · ')||'—';}
 function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0;
   for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hrs(D);b+=nmv(d,D);c+=(D.m&&has(D))?1:0;}
@@ -235,6 +253,22 @@ document.addEventListener('input',e=>{const t=e.target,ds=t.dataset;
 });
 function changeMonth(){const y=+$('#yr').value;if(!y)return;st.y=y;st.m=+$('#mo').value;st.open=0;load();render();}
 $('#mo').addEventListener('change',changeMonth);$('#yr').addEventListener('change',changeMonth);
+
+function preview(){
+  const n=new Date(st.y,st.m+1,0).getDate(),T={k:0,l:0,m:0,c1:0,c2:0,c3:0,c4:0},C=['c1','c2','c3','c4'];let rows='';
+  for(let d=1;d<=n;d++){
+    const D=st.days[d]||{},w=new Date(st.y,st.m,d).getDay(),h=hrs(D),l=h?nmv(d,D):0;
+    T.k+=h;T.l+=l;if(D.m)T.m++;C.forEach(c=>{if(D[c])T[c]++});
+    rows+='<tr class="'+(w===0||w===6?'we':'')+'"><td>'+d+'</td><td>'+DOW[w]+'</td>'+[0,1,2,3,4,5,6,7].map(i=>'<td>'+esc(fh(D['t'+i]))+'</td>').join('')+'<td>'+(h||'')+'</td><td>'+(l||'')+'</td><td>'+(D.m?1:'')+'</td><td class="tw">'+esc(D.w||'')+'</td><td>'+esc(D.q||'')+'</td>'+C.map(c=>'<td>'+(D[c]?1:'')+'</td>').join('')+'</tr>';
+  }
+  const th=s=>'<th>'+s+'</th>';
+  const head='<tr>'+th('Date')+th('Jour')+'<th colspan="4">Jour (5h–21h)</th><th colspan="4">Nuit (21h–5h)</th>'+th('NM')+th('M')+th('Panier')+th('Travaux effectués')+th('Frais')+'<th colspan="4">Déplacement</th></tr><tr>'+th('')+th('')+['de','à','de','à','de','à','de','à'].map(x=>th(x)).join('')+th('')+th('')+th('')+th('')+th('')+['P.Déj','Déj','Din','Déc'].map(x=>th(x)).join('')+'</tr>';
+  const tot='<tr class="tot"><td colspan="10">Total</td><td>'+rd(T.k)+'</td><td>'+rd(T.l)+'</td><td>'+T.m+'</td><td></td><td></td>'+C.map(c=>'<td>'+T[c]+'</td>').join('')+'</tr>';
+  $('#pvi').textContent=MONTHS[st.m]+' '+st.y+' · '+(st.set.sn||'')+' · Mle '+(st.set.sm||'')+' · Classement '+(st.set.sc||'');
+  $('#pvt').innerHTML='<table><thead>'+head+'</thead><tbody>'+rows+tot+'</tbody></table>';
+  $('#pv').hidden=false;
+}
+$('#pvb').addEventListener('click',preview);$('#pvx').addEventListener('click',()=>{$('#pv').hidden=true});
 
 async function makeXlsx(){
   const zip=await JSZip.loadAsync(TPL,{base64:true});
