@@ -143,6 +143,7 @@ function setCalc(xml,ref,v){
   return xml.replace(new RegExp('(<c r="'+ref+'"[^>]*>\\s*<f>[^<]*</f>\\s*<v>)[^<]*(</v>)'),'$1'+v+'$2');
 }
 function hrs(D){let s=0;for(let i=0;i<8;i+=2){const a=D['t'+i],b=D['t'+(i+1)];if(a&&b){let x=(+b.slice(0,2))*60+(+b.slice(3,5))-((+a.slice(0,2))*60+(+a.slice(3,5)));if(x<0)x+=1440;s+=x}}return rd(s/60)}
+const fh=t=>t?String(t).replace(':','h'):'';
 function has(D){return Object.keys(D).some(k=>D[k])}
 function fillSheet(xml,y,m,days,ex,set){
   const n=new Date(y,m+1,0).getDate(),T={K:0,L:0,M:0,R:0,S:0,T:0,U:0};
@@ -150,10 +151,10 @@ function fillSheet(xml,y,m,days,ex,set){
     const r=12+d,ok=d<=n,w=new Date(y,m,d).getDay(),D=ok?(days[d]||{}):{};
     xml=setCell(xml,'A'+r,ok?String(d):'');
     xml=setCell(xml,'B'+r,ok?DOW[w]:'',ok&&(w===0||w===6)?36:26);
-    'CDEFGHIJ'.split('').forEach((c,i)=>{xml=setCell(xml,c+r,D['t'+i]||'')});
-    const kv=hrs(D)?rd(hrs(D)*(w===0?1.75:1.5)):0;if(kv)T.K+=kv;xml=setCell(xml,'K'+r,kv||'');
-    const lv=hrs(D);if(lv)T.L+=lv;xml=setCell(xml,'L'+r,lv?lv:'');
-    const pv=has(D)?(D.m?1:0):null;if(pv)T.M+=pv;xml=setCell(xml,'M'+r,pv==null?'':pv);
+    'CDEFGHIJ'.split('').forEach((c,i)=>{xml=setCell(xml,c+r,fh(D['t'+i]))});
+    const kv=hrs(D);if(kv)T.K+=kv;xml=setCell(xml,'K'+r,kv||'');
+    const lv=hrs(D)?rd(hrs(D)*(w===0?1.75:1.5)):0;if(lv)T.L+=lv;xml=setCell(xml,'L'+r,lv||'');
+    const pv=D.m?1:0;if(pv)T.M+=pv;xml=setCell(xml,'M'+r,pv||'');
     xml=setCell(xml,'N'+r,D.w||'');
     const q=num(D.q);xml=setCell(xml,'Q'+r,q==null?(D.q||''):q);
     [['R','c1'],['S','c2'],['T','c3'],['U','c4']].forEach(([c,k])=>{if(D[k])T[c]++;xml=setCell(xml,c+r,D[k]?1:'')});
@@ -198,20 +199,20 @@ function form(d){const D=st.days[d]||{};
   return `<div class="fm">
 <h4>النهار · Jour (5h–21h)</h4><div class="g4">${inp(d,'t0','time','de')}${inp(d,'t1','time','à')}${inp(d,'t2','time','de')}${inp(d,'t3','time','à')}</div>
 <details class="sub"${D.t4||D.t5||D.t6||D.t7?' open':''}><summary>الليل · Nuit (21h–5h)</summary><div class="g4" style="margin-top:8px">${inp(d,'t4','time','de')}${inp(d,'t5','time','à')}${inp(d,'t6','time','de')}${inp(d,'t7','time','à')}</div></details>
-<h4>الساعات · Total HS / Panier</h4><div class="g3"><label>NM (تلقائي)<input id="nm${d}" readonly dir="ltr" value="${hrs(D)?nmv(d,D):''}"></label><label>M (تلقائي)<input id="mh${d}" readonly dir="ltr" value="${hrs(D)||''}"></label>${chk(d,'m','Panier')}</div>
+<h4>الساعات · Total HS / Panier</h4><div class="g3"><label>NM (تلقائي)<input id="nm${d}" readonly dir="ltr" value="${hrs(D)||''}"></label><label>M (تلقائي)<input id="mh${d}" readonly dir="ltr" value="${hrs(D)?nmv(d,D):''}"></label>${chk(d,'m','Panier')}</div>
 <h4>الأشغال المنجزة</h4><label>Travaux effectués<textarea data-d="${d}" data-k="w" rows="2" dir="auto">${esc(D.w||'')}</textarea></label>
 <details class="sub"${D.q?' open':''}><summary>Frais de voyage</summary><div style="margin-top:8px">${inp(d,'q','number','المبلغ','step="0.01" min="0" inputmode="decimal"')}</div></details>
 <h4>التنقل · Déplacement</h4>
-<div class="cks">${chk(d,'c1','P.Déj')}${chk(d,'c2','Déj')}${chk(d,'c3','Din')}${chk(d,'c4','Déc')}</div>
+<div class="cks" dir="ltr">${chk(d,'c1','P.Déj')}${chk(d,'c2','Déj')}${chk(d,'c3','Din')}${chk(d,'c4','Déc')}</div>
 <div class="act"><button data-act="cp">نسخ من اليوم السابق</button><button data-act="clr" class="gh">مسح اليوم</button></div></div>`;}
 function sum(d){const D=st.days[d]||{},p=[];
   for(let i=0;i<8;i+=2)if(D['t'+i]&&D['t'+(i+1)])p.push(D['t'+i]+'–'+D['t'+(i+1)]);
-  const hs=hrs(D);if(hs)p.push(hs+'h · NM '+nmv(d,D));if(D.m)p.push('Panier');
+  const hs=hrs(D);if(hs)p.push('NM '+hs+'h · M '+nmv(d,D));if(D.m)p.push('Panier');
   if(D.c1||D.c2||D.c3||D.c4)p.push('تنقل');
   if(D.w)p.push(D.w.slice(0,24));
   return p.join(' · ')||'—';}
 function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0;
-  for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=nmv(d,D);b+=hrs(D);c+=(D.m&&has(D))?1:0;}
+  for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hrs(D);b+=nmv(d,D);c+=(D.m&&has(D))?1:0;}
   $('#tot').innerHTML='NM '+rd(a)+' · M '+rd(b)+' · Panier '+rd(c)+'<span id="msg"></span>';}
 function render(){const n=new Date(st.y,st.m+1,0).getDate();let h='';
   for(let d=1;d<=n;d++){const w=new Date(st.y,st.m,d).getDay(),we=w===0||w===6;
@@ -228,7 +229,7 @@ $('#list').addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{const t=e.target,ds=t.dataset;
   if(ds.k){const d=ds.d;(st.days[d]=st.days[d]||{})[ds.k]=t.type==='checkbox'?t.checked:t.value;save();
-    const s=$('#sm'+d);if(s)s.textContent=sum(d);const mh=$('#mh'+d);if(mh)mh.value=hrs(st.days[d])||'';const ne=$('#nm'+d);if(ne)ne.value=hrs(st.days[d])?nmv(d,st.days[d]):'';totals();}
+    const s=$('#sm'+d);if(s)s.textContent=sum(d);const mh=$('#mh'+d);if(mh)mh.value=hrs(st.days[d])?nmv(d,st.days[d]):'';const ne=$('#nm'+d);if(ne)ne.value=hrs(st.days[d])||'';totals();}
   else if(ds.set){st.set[ds.set]=t.value;save();}
   else if(ds.ex){st.ex[ds.ex]=t.value;save();}
 });
