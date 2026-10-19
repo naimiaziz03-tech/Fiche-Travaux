@@ -65,13 +65,13 @@ button{font:inherit;cursor:pointer}
 .pvh{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--card)}
 .pvh button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 14px}
 .pvi{font-size:12px;padding:8px 14px;color:var(--mut);direction:ltr;text-align:left}
-#pvt{flex:1;overflow:auto;padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}
-#pvt table{border-collapse:collapse;font-size:12px;min-width:780px;direction:ltr;background:var(--card)}
-#pvt th,#pvt td{border:1px solid var(--line);padding:4px 6px;text-align:center;white-space:nowrap}
-#pvt th{background:var(--bg);font-weight:600}
+#pvt{flex:1;overflow:auto;background:#fff;color:#000;padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}
+#pvt table{border-collapse:collapse;font-size:12px;min-width:780px;direction:ltr;background:#fff;color:#000}
+#pvt th,#pvt td{border:1px solid #b5b5b5;padding:4px 6px;text-align:center;white-space:nowrap}
+#pvt th{background:#f2f2f2;font-weight:600}
 #pvt td.tw{white-space:normal;min-width:150px;text-align:start}
-#pvt tr.we td:nth-child(2){color:var(--red);font-weight:700}
-#pvt tr.tot td{font-weight:700;background:var(--bg)}
+#pvt tr.we td:nth-child(2){color:#c00000;font-weight:700}
+#pvt tr.tot td{font-weight:700;background:#f2f2f2}
 .note{font-size:12.5px;color:var(--mut);margin:4px 2px 12px}
 .ckrow{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink)}
 </style>
@@ -225,8 +225,8 @@ function form(d){const D=st.days[d]||{};
 <div class="act"><button data-act="cp">نسخ من اليوم السابق</button></div></div>`;}
 function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);
   for(let i=0;i<8;i+=2)if(D['t'+i]&&D['t'+(i+1)])p.push(fh(D['t'+i])+'–'+fh(D['t'+(i+1)]));
-  const hs=hrs(D);if(hs)p.push('NM '+hs+'h · M '+nmv(d,D));if(D.m)p.push('Panier');
-  if(D.c1||D.c2||D.c3||D.c4)p.push('تنقل');
+  if(D.m)p.push('Panier');
+  
   
   return p.join(' · ')||'—';}
 function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0;
