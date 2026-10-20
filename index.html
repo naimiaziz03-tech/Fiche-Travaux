@@ -80,6 +80,10 @@ button{font:inherit;cursor:pointer}
 #pvt tr.we td:nth-child(2){color:#c00000;font-weight:700}
 #pvt tr.tot td{font-weight:700;background:#f2f2f2}
 .day.rd .dh span{color:var(--red)}
+.day.op{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.day.today .dh b{background:var(--acc);color:var(--accink);border-radius:8px;padding:0 6px;min-width:0}
+.sg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.sg:empty{display:none}
+.chip{border:1px solid var(--acc);color:var(--acc);background:transparent;border-radius:999px;padding:5px 12px;font-size:14px}
 #pvt tr.red td{color:#c00000}
 .note{font-size:12.5px;color:var(--mut);margin:4px 2px 12px}
 .ckrow{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink)}
@@ -253,10 +257,13 @@ function inp(d,k,type,lab,att){const v=(st.days[d]||{})[k]??'';
   return `<label>${lab}<input data-d="${d}" data-k="${k}" type="${type}" dir="ltr" value="${esc(v)}" ${att||''}></label>`;}
 function chk(d,k,lab){const v=(st.days[d]||{})[k];
   return `<label class="ck"><input data-d="${d}" data-k="${k}" type="checkbox" ${v?'checked':''}>${lab}</label>`;}
+const SUG=['Travaux au Centre','Congé annuel','Repos Statutaire','Repos Compensateur','Jour Férié'];
+const nz=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+function sgh(v){const s=nz(v);if(s.length<2)return '';return SUG.filter(x=>nz(x).startsWith(s)&&nz(x)!==s).map(x=>`<button type="button" class="chip" data-sg="${x}">${x}</button>`).join('');}
 function p2(d,a,b){const D=st.days[d]||{};return `<details class="sub p2"${D[a]||D[b]?' open':''}><summary>+ فترة ثانية</summary><div class="g4" style="margin-top:8px">${inp(d,a,'time','de')}${inp(d,b,'time','à')}</div></details>`;}
 function form(d){const D=st.days[d]||{};
   return `<div class="fm">
-<label>Travaux effectués<textarea data-d="${d}" data-k="w" rows="2" dir="auto">${esc(D.w||'')}</textarea></label>
+<label>Travaux effectués<textarea data-d="${d}" data-k="w" rows="2" dir="auto">${esc(D.w||'')}</textarea></label><div class="sg" id="sg${d}">${sgh(D.w)}</div>
 <h4>النهار · Jour (5h–21h)</h4><div class="g4">${inp(d,'t0','time','de')}${inp(d,'t1','time','à')}</div>${p2(d,'t2','t3')}
 <details class="sub"${D.t4||D.t5||D.t6||D.t7?' open':''}><summary>الليل · Nuit (21h–5h)</summary><div class="g4" style="margin-top:8px">${inp(d,'t4','time','de')}${inp(d,'t5','time','à')}</div>${p2(d,'t6','t7')}</details>
 <h4>الساعات · Total HS / Panier</h4><div class="g3"><label>NM (تلقائي)<input id="nm${d}" readonly dir="ltr" value="${hd(d,D)||''}"></label><label>M (تلقائي)<input id="mh${d}" readonly dir="ltr" value="${hd(d,D)?nmv(d,D):''}"></label>${chk(d,'m','Panier')}</div>
@@ -265,21 +272,23 @@ function form(d){const D=st.days[d]||{};
 <h4>Déplacement</h4>
 <div class="cks" dir="ltr">${chk(d,'c1','P.Déj')}${chk(d,'c2','Déj')}${chk(d,'c3','Din')}${chk(d,'c4','Déc')}</div>
 <div class="act"><button data-act="cp">نسخ من اليوم السابق</button></div></div>`;}
-function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);{const q=spc(D);if(q&&!q[3])p.push(q[1]+'–'+q[2]);}
-  for(let i=0;i<8;i+=2)if(!isC(D)&&tt(D,i)&&tt(D,i+1))p.push(tt(D,i)+'–'+tt(D,i+1));
-  if(D.m)p.push('Panier');
+function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);
+  for(let i=0;i<8;i+=2)if(!spc(D)&&tt(D,i)&&tt(D,i+1))p.push(tt(D,i)+'–'+tt(D,i+1));
+  
   
   
   return p.join(' · ')||'—';}
 function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0;
   for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hd(d,D);b+=nmv(d,D);c+=(D.m&&has(D))?1:0;}
   $('#tot').innerHTML='NM '+rd(a)+' · M '+rd(b)+' · Panier '+rd(c)+'<span id="msg"></span>';}
-function render(){const n=new Date(st.y,st.m+1,0).getDate();let h='';
+function render(){const n=new Date(st.y,st.m+1,0).getDate(),nw=new Date(),tdy=(nw.getFullYear()===st.y&&nw.getMonth()===st.m)?nw.getDate():0;let h='';
   for(let d=1;d<=n;d++){const w=new Date(st.y,st.m,d).getDay(),we=w===0||w===6;
-    h+=`<div class="day${we?' we':''}${isR(st.days[d]||{})?' rd':''}" id="day${d}"><button class="dh" data-open="${d}"><b>${d}</b><i>${DOW[w]}</i><span id="sm${d}">${esc(sum(d))}</span></button>${st.open===d?form(d):''}</div>`;}
+    h+=`<div class="day${we?' we':''}${isR(st.days[d]||{})?' rd':''}${st.open===d?' op':''}${d===tdy?' today':''}" id="day${d}"><button class="dh" data-open="${d}"><b>${d}</b><i>${DOW[w]}</i><span id="sm${d}">${esc(sum(d))}</span></button>${st.open===d?form(d):''}</div>`;}
   $('#list').innerHTML=h;totals();}
 
 $('#list').addEventListener('click',e=>{
+  const sg=e.target.closest('[data-sg]');
+  if(sg){const ta=sg.closest('.fm').querySelector('textarea');ta.value=sg.dataset.sg;ta.dispatchEvent(new Event('input',{bubbles:true}));return;}
   const b=e.target.closest('[data-open]');
   if(b){const d=+b.dataset.open;st.open=st.open===d?0:d;render();if(st.open)$('#day'+d).scrollIntoView({block:'start'});return;}
   const a=e.target.closest('[data-act]');
@@ -289,7 +298,7 @@ $('#list').addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{const t=e.target,ds=t.dataset;
   if(ds.k){const d=ds.d;(st.days[d]=st.days[d]||{})[ds.k]=t.type==='checkbox'?t.checked:t.value;save();
-    const s=$('#sm'+d);if(s)s.textContent=sum(d);const mh=$('#mh'+d);if(mh)mh.value=hd(d,st.days[d])?nmv(d,st.days[d]):'';const ne=$('#nm'+d);if(ne)ne.value=hd(d,st.days[d])||'';const dy=$('#day'+d);if(dy)dy.classList.toggle('rd',isR(st.days[d]));totals();}
+    const s=$('#sm'+d);if(s)s.textContent=sum(d);const mh=$('#mh'+d);if(mh)mh.value=hd(d,st.days[d])?nmv(d,st.days[d]):'';const ne=$('#nm'+d);if(ne)ne.value=hd(d,st.days[d])||'';const dy=$('#day'+d);if(dy)dy.classList.toggle('rd',isR(st.days[d]));if(ds.k==='w'){const sg=$('#sg'+d);if(sg)sg.innerHTML=sgh(t.value);}totals();}
   else if(ds.set){st.set[ds.set]=t.value;save();}
   else if(ds.ex){st.ex[ds.ex]=t.value;save();}
 });
