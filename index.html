@@ -79,7 +79,7 @@ button{font:inherit;cursor:pointer}
 #pvt td.tw{white-space:normal;min-width:150px;text-align:start}
 #pvt tr.we td:nth-child(2){color:#c00000;font-weight:700}
 #pvt tr.tot td{font-weight:700;background:#f2f2f2}
-.day.rd .dh span{color:var(--red)}
+.day.rd .dh span,.day.we .dh span{color:var(--red)}
 .day.op{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
 .day.today .dh b{background:var(--acc);color:var(--accink);border-radius:8px;padding:0 6px;min-width:0}
 .sg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.sg:empty{display:none}
@@ -191,7 +191,7 @@ function fillSheet(xml,y,m,days,ex,set,rm){
     xml=setCell(xml,'N'+r,D.w||'');
     const q=num(D.q);xml=setCell(xml,'Q'+r,q==null?(D.q||''):q);
     [['R','c1'],['S','c2'],['T','c3'],['U','c4']].forEach(([c,k])=>{if(D[k])T[c]++;xml=setCell(xml,c+r,D[k]?1:'')});
-    if(ok&&rm&&isR(D))'ABCDEFGHIJKLMNOPQRSTUV'.split('').forEach(c=>{xml=restyle(xml,c+r,rm)});
+    if(ok&&rm&&(isR(D)||w===0||w===6))'ABCDEFGHIJKLMNOPQRSTUV'.split('').forEach(c=>{xml=restyle(xml,c+r,rm)});
   }
   Object.keys(T).forEach(c=>{xml=setCalc(xml,c+'44',rd(T[c]))});
   xml=setCalc(xml,'N48',rd(T.L));xml=setCalc(xml,'O48',rd(T.K));
@@ -315,7 +315,7 @@ function preview(){
   for(let d=1;d<=n;d++){
     const D=st.days[d]||{},w=new Date(st.y,st.m,d).getDay(),h=hd(d,D),l=mv(d,D);
     T.k+=h;T.l+=l;if(isRC(D))T.rc=(T.rc||0)+1;if(D.m)T.m++;C.forEach(c=>{if(D[c])T[c]++});
-    rows+='<tr class="'+(w===0||w===6?'we':'')+(isR(D)?' red':'')+'"><td>'+d+'</td><td>'+DOW[w]+'</td>'+[0,1,2,3,4,5,6,7].map(i=>'<td>'+esc(tt(D,i))+'</td>').join('')+'<td>'+(h||'')+'</td><td>'+(l||'')+'</td><td>'+(D.m?1:'')+'</td><td class="tw">'+esc(D.w||'')+'</td><td>'+esc(D.q||'')+'</td>'+C.map(c=>'<td>'+(D[c]?1:'')+'</td>').join('')+'</tr>';
+    rows+='<tr class="'+(w===0||w===6?'we':'')+(isR(D)||w===0||w===6?' red':'')+'"><td>'+d+'</td><td>'+DOW[w]+'</td>'+[0,1,2,3,4,5,6,7].map(i=>'<td>'+esc(tt(D,i))+'</td>').join('')+'<td>'+(h||'')+'</td><td>'+(l||'')+'</td><td>'+(D.m?1:'')+'</td><td class="tw">'+esc(D.w||'')+'</td><td>'+esc(D.q||'')+'</td>'+C.map(c=>'<td>'+(D[c]?1:'')+'</td>').join('')+'</tr>';
   }
   const th=s=>'<th>'+s+'</th>';
   const head='<tr>'+th('Date')+th('Jour')+'<th colspan="4">Jour (5h–21h)</th><th colspan="4">Nuit (21h–5h)</th>'+th('NM')+th('M')+th('Panier')+th('Travaux effectués')+th('Frais')+'<th colspan="4">Déplacement</th></tr><tr>'+th('')+th('')+['de','à','de','à','de','à','de','à'].map(x=>th(x)).join('')+th('')+th('')+th('')+th('')+th('')+['P.Déj','Déj','Din','Déc'].map(x=>th(x)).join('')+'</tr>';
