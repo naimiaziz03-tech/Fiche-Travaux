@@ -108,7 +108,7 @@ input:not([type=checkbox]),select{height:44px;box-sizing:border-box}
 <div id="toast" hidden></div>
 <p class="sub">أدخل معلومات كل يوم، والتطبيق يملأ لك ملف Excel بنفس تنسيق نموذجك.</p>
 
-<section class="card row">
+<section class="card row" dir="ltr">
 <label>الشهر<select id="mo"></select></label>
 <label>السنة<input id="yr" type="number" dir="ltr" min="2000" max="2100"></label>
 </section>
@@ -384,7 +384,7 @@ $('#dl').addEventListener('click',async()=>{
   b.disabled=true;msg('جارٍ تحضير الملف…');
   try{
     const blob=await makeXlsx();
-    const fn=((st.set.sn||'Fiche').trim().replace(/[^\w]+/g,'_')||'Fiche')+'_'+st.y+'-'+String(st.m+1).padStart(2,'0')+'.xlsx';
+    const fn=((st.set.sn||'Fiche').trim().replace(/[^\w]+/g,'_')||'Fiche')+'_'+MONTHS[st.m].normalize('NFD').replace(/[\u0300-\u036f]/g,'')+'_'+st.y+'.xlsx';
     const dl=window.claude?await window.claude.use('downloads'):null;
     if(dl){await dl.save({filename:fn,data:blob});msg('تم الحفظ ✓');}
     else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();msg('تم التنزيل ✓');}
