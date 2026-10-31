@@ -298,7 +298,7 @@ function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0,r=0,
   for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hd(d,D);b+=mv(d,D);if(isRC(D))r++;c+=(D.m&&has(D))?1:0;
     for(const k in prices)if(D[k])meal+=prices[k];
   }
-  $('#tot').innerHTML='<div>NM '+rd(a)+' · M '+rd(b)+' · Panier '+rd(c)+' · RC '+r+'</div><div style="font-size:16px;color:var(--acc);font-weight:700">المجموع: '+rd(meal)+' DH</div><span id="msg"></span>';}
+  $('#tot').innerHTML='<div>NM '+rd(a)+' · M '+rd(b)+' · Panier '+rd(c)+' · RC '+r+'</div><div style="font-size:8px;color:var(--acc);font-weight:700">المجموع: '+rd(meal)+' DH</div><span id="msg"></span>';}
 function render(){const n=new Date(st.y,st.m+1,0).getDate(),nw=new Date(),tdy=(nw.getFullYear()===st.y&&nw.getMonth()===st.m)?nw.getDate():0;let h='';
   for(let d=1;d<=n;d++){const w=new Date(st.y,st.m,d).getDay(),we=w===0||w===6;
     h+=`<div class="day${we?' we':''}${isR(st.days[d]||{})?' rd':''}${st.open===d?' op':''}${d===tdy?' today':''}" id="day${d}"><button class="dh" data-open="${d}"><b>${d}</b><i>${DOW[w]}</i><span id="sm${d}">${esc(sum(d))}</span></button>${st.open===d?form(d):''}</div>`;}
