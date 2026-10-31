@@ -60,7 +60,7 @@ button{font:inherit;cursor:pointer}
 .act button{flex:1;padding:9px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
 .act .gh{color:var(--red)}
 .bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px}
-#tot{flex:1;font-size:12.5px;color:var(--mut)}
+#tot{flex:1;font-size:16px;color:var(--ink);text-align:right;line-height:1.4}
 #msg{display:block;margin-top:2px}
 #dl{background:var(--acc);color:var(--accink);border:0;border-radius:12px;padding:12px 16px;font-weight:700}
 #dl:disabled{opacity:.6}
@@ -103,9 +103,17 @@ input:not([type=checkbox]),select{height:44px;box-sizing:border-box}
 <body>
 <main>
 <div class="top"><button id="mn" class="ic" aria-label="menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1>Fiche de travaux</h1>
-<div id="menu" hidden><button id="mx">إرسال / حفظ نسخة كاملة للمعلومات</button><button id="mi">استرجاع نسخة</button></div></div>
+<div id="menu" hidden><button id="ma">عرض الأشهر السابقة بمدخلاتها</button><button id="mx">حفظ نسخة احتياطية في الهاتف</button><button id="mi">استرجاع نسخة</button></div></div>
 <input type="file" id="imf" accept=".json,application/json" hidden>
 <div id="toast" hidden></div>
+<div id="archive" hidden style="position:fixed;inset:0;z-index:25;background:var(--bg);padding:20px;overflow:auto">
+  <div class="card" style="max-width:520px;margin:20px auto">
+    <h3 style="margin-top:0">الأشهر السابقة المحفوظة</h3>
+    <p class="sub">اختار الشهر باش تشوف المدخلات ديالو. البيانات كتتحفظ تلقائياً فهاد الهاتف.</p>
+    <label>الشهر<select id="archivemo"></select></label>
+    <div class="act"><button id="archivego">عرض المدخلات</button><button id="archiveclose">إغلاق</button></div>
+  </div>
+</div>
 <p class="sub">أدخل معلومات كل يوم، والتطبيق يملأ لك ملف Excel بنفس تنسيق نموذجك.</p>
 
 <section class="card row" dir="ltr">
@@ -241,7 +249,7 @@ function stripVisa(dx){
 //</core>
 
 const $=s=>document.querySelector(s);
-const DEF={sn:'NAIMI AZIZ',sm:'83684 L',sc:'05/10/07',ss:':Maintenence TAZA',sk:' :ITOF R1P1'};
+const DEF={sn:'NAIMI AZIZ',sm:'83684 L',sc:'05/10/09',ss:':Maintenence TAZA',sk:' :ITOF R1P1'};
 const st={y:0,m:0,days:{},ex:{},set:{...DEF},open:0};
 const ls={
   get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
@@ -285,9 +293,12 @@ function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);
   
   
   return p.join(' · ')||'—';}
-function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0,r=0;
-  for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hd(d,D);b+=mv(d,D);if(isRC(D))r++;c+=(D.m&&has(D))?1:0;}
-  $('#tot').innerHTML='NM '+rd(a)+' · M '+rd(b)+' · Panier '+rd(c)+' · RC '+r+'<span id="msg"></span>';}
+function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0,r=0,meal=0;
+  const prices={c1:40,c2:80,c3:80,c4:130};
+  for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hd(d,D);b+=mv(d,D);if(isRC(D))r++;c+=(D.m&&has(D))?1:0;
+    for(const k in prices)if(D[k])meal+=prices[k];
+  }
+  $('#tot').innerHTML='<div>NM '+rd(a)+' · M '+rd(b)+' · Panier '+rd(c)+' · RC '+r+'</div><div style="font-size:16px;color:var(--acc);font-weight:700">المجموع: '+rd(meal)+' DH</div><span id="msg"></span>';}
 function render(){const n=new Date(st.y,st.m+1,0).getDate(),nw=new Date(),tdy=(nw.getFullYear()===st.y&&nw.getMonth()===st.m)?nw.getDate():0;let h='';
   for(let d=1;d<=n;d++){const w=new Date(st.y,st.m,d).getDay(),we=w===0||w===6;
     h+=`<div class="day${we?' we':''}${isR(st.days[d]||{})?' rd':''}${st.open===d?' op':''}${d===tdy?' today':''}" id="day${d}"><button class="dh" data-open="${d}"><b>${d}</b><i>${DOW[w]}</i><span id="sm${d}">${esc(sum(d))}</span></button>${st.open===d?form(d):''}</div>`;}
@@ -339,12 +350,27 @@ async function saveBlob(blob,fn){
   if(dl){await dl.save({filename:fn,data:blob});}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();}
 }
+$('#ma').addEventListener('click',()=>{
+  $('#menu').hidden=true;
+  const sel=$('#archivemo');const opts=[];
+  const now=new Date();
+  for(let i=0;i<36;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1),key='ft:'+d.getFullYear()+'-'+d.getMonth();
+    if(i===0||ls.get(key)){opts.push({y:d.getFullYear(),m:d.getMonth(),label:MONTHS[d.getMonth()]+' '+d.getFullYear(),key});}}
+  sel.innerHTML=opts.map(o=>`<option value="${o.y}-${o.m}">${o.label}${ls.get(o.key)?' ✓':''}</option>`).join('');
+  $('#archive').hidden=false;
+});
+$('#archiveclose').addEventListener('click',()=>$('#archive').hidden=true);
+$('#archivego').addEventListener('click',()=>{
+  const v=$('#archivemo').value.split('-');if(v.length!==2)return;
+  st.y=+v[0];st.m=+v[1];$('#yr').value=st.y;$('#mo').value=st.m;
+  st.open=0;load();render();$('#archive').hidden=true;window.scrollTo(0,0);
+});
 $('#mx').addEventListener('click',async()=>{
   $('#menu').hidden=true;
   const o={app:'fiche-travaux',v:1,at:new Date().toISOString(),data:{}};
   try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ft:'))o.data[k]=JSON.parse(localStorage.getItem(k));}}catch(e){}
   const blob=new Blob([JSON.stringify(o)],{type:'application/json'});
-  const fn='Fiche_sauvegarde_'+new Date().toISOString().slice(0,10)+'.json';
+  const fn='Fiche_Entrees_Sauvegarde_'+new Date().toISOString().slice(0,10)+'.json';
   try{
     const f=new File([blob],fn,{type:'application/json'});
     if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Fiche de travaux'});return;}
@@ -396,7 +422,7 @@ $('#dl').addEventListener('click',async()=>{
   const now=new Date();st.y=now.getFullYear();st.m=now.getMonth();
   $('#mo').innerHTML=MONTHS.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
   $('#mo').value=st.m;$('#yr').value=st.y;
-  st.set={...DEF,...(ls.get('ft:set')||{})};if(st.set.sc==='05/09/07')st.set.sc=DEF.sc;
+  st.set={...DEF,...(ls.get('ft:set')||{})};if(st.set.sc==='05/09/07'||st.set.sc==='05/10/07')st.set.sc=DEF.sc;
   document.querySelectorAll('[data-set]').forEach(i=>{i.value=st.set[i.dataset.set]||''});
   st.open=now.getDate();load();render();
   setTimeout(()=>{const e=$('#day'+st.open);if(e)e.scrollIntoView({block:'start'})},80);
