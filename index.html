@@ -178,7 +178,8 @@ function setCell(xml,ref,val,style){
 function setCalc(xml,ref,v){
   return xml.replace(new RegExp('(<c r="'+ref+'"[^>]*>\\s*<f>[^<]*</f>\\s*<v>)[^<]*(</v>)'),'$1'+v+'$2');
 }
-function hrs(D,wd){if(isC(D))return 0;let s=0;for(let i=0;i<8;i+=2){const a=g(D,i),b=g(D,i+1);if(a&&b){const sm=(+a.slice(0,2))*60+(+a.slice(3,5));let em=(+b.slice(0,2))*60+(+b.slice(3,5));if(em<sm)em+=1440;s+=Math.max(0,em-(wd===0||wd===6?sm:Math.max(sm,1020)))}}return rd(s/60)}
+function isTC(D){return /travaux\s*au\s*centre/i.test(String(D.w||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''))}
+function hrs(D,wd){if(isC(D)||isTC(D))return 0;let s=0;for(let i=0;i<8;i+=2){const a=g(D,i),b=g(D,i+1);if(a&&b){const sm=(+a.slice(0,2))*60+(+a.slice(3,5));let em=(+b.slice(0,2))*60+(+b.slice(3,5));if(em<sm)em+=1440;s+=Math.max(0,em-(wd===0||wd===6?sm:Math.max(sm,1020)))}}return rd(s/60)}
 const fh=t=>t?String(t).replace(':','h'):'';
 const SP=[[/conge\s*an+u[ae]?l/,'C','A',0,1],[/repos\s*statut/,'R','S',0,1],[/repos\s*compens/,'R','C',0,1,1],[/jour\s*feri/,'J','F',0,1],[/travaux\s*au\s*centre/,'08h00','16h30',1]];
 const spc=D=>{const s=String(D.w||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return SP.find(p=>p[0].test(s))||null};
