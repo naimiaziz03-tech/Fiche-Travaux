@@ -199,7 +199,7 @@ function fillSheet(xml,y,m,days,ex,set,rm){
     xml=setCell(xml,'B'+r,ok?DOW[w]:'',ok&&(w===0||w===6)?(rm&&rm.br!=null?rm.br:36):(rm&&rm.bk!=null?rm.bk:26));
     'CDEFGHIJ'.split('').forEach((c,i)=>{xml=setCell(xml,c+r,tt(D,i))});
     const kv=hrs(D,w);if(kv)T.K+=kv;xml=setCell(xml,'K'+r,kv||'');
-    const isrc=ok&&isRC(D);if(isrc)nRC++;const lv=kv?rd(kv*(spc(D)&&spc(D)[3]?1:(w===0?1.75:1.5))):0;if(lv)T.L+=lv;xml=setCell(xml,'L'+r,lv||'');
+    const isrc=ok&&isRC(D);if(isrc)nRC++;const lv=isrc?-8.5:(kv?rd(kv*(spc(D)&&spc(D)[3]?1:(w===0?1.75:1.5))):0);if(lv)T.L+=lv;xml=setCell(xml,'L'+r,lv||'');
     const pv=D.m?1:0;if(pv)T.M+=pv;xml=setCell(xml,'M'+r,pv||'');
     xml=setCell(xml,'N'+r,D.w||'');
     const q=num(D.q);xml=setCell(xml,'Q'+r,q==null?(D.q||''):q);
@@ -261,25 +261,10 @@ const ls={
 const mk=()=>'ft:'+st.y+'-'+st.m;
 const hd=(d,D)=>hrs(D,new Date(st.y,st.m,+d).getDay());
 const nmv=(d,D)=>rd(hd(d,D)*(spc(D)&&spc(D)[3]?1:(new Date(st.y,st.m,+d).getDay()===0?1.75:1.5)));
-const mv=(d,D)=>hd(d,D)?nmv(d,D):0;
+const mv=(d,D)=>isRC(D)?-8.5:(hd(d,D)?nmv(d,D):0);
 function load(){const d=ls.get(mk())||{};st.days=d.days||{};st.ex={};
   document.querySelectorAll('[data-ex]').forEach(i=>{i.value=st.ex[i.dataset.ex]||''});}
-let autoBackupTimer=null,autoBackupReady=false;
-function backupObject(){const o={app:'fiche-travaux',v:1,at:new Date().toISOString(),data:{}};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ft:'))o.data[k]=JSON.parse(localStorage.getItem(k));}}catch(e){}return o;}
-function autoBackup(){
-  if(!autoBackupReady)return;
-  clearTimeout(autoBackupTimer);
-  autoBackupTimer=setTimeout(()=>{
-    try{
-      const o=backupObject(),blob=new Blob([JSON.stringify(o,null,2)],{type:'application/json'});
-      const fn='Fiche_Travaux_AutoBackup_'+new Date().toISOString().slice(0,10)+'.json';
-      const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=fn;document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),10000);
-      toast('تم تنزيل نسخة احتياطية تلقائياً ✓');
-    }catch(e){toast('تعذر إنشاء النسخة الاحتياطية التلقائية');}
-  },1800);
-}
-function save(){ls.set(mk(),{days:st.days,ex:st.ex});ls.set('ft:set',st.set);autoBackup();}
+function save(){ls.set(mk(),{days:st.days,ex:st.ex});ls.set('ft:set',st.set);}
 
 const TOPT=(()=>{const a=[];for(let h=0;h<24;h++)for(const m of['00','30'])a.push(String(h).padStart(2,'0')+':'+m);return a})();
 function tsel(d,k,lab,v){
@@ -385,7 +370,8 @@ $('#archivego').addEventListener('click',()=>{
 });
 $('#mx').addEventListener('click',async()=>{
   $('#menu').hidden=true;
-  const o=backupObject();
+  const o={app:'fiche-travaux',v:1,at:new Date().toISOString(),data:{}};
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ft:'))o.data[k]=JSON.parse(localStorage.getItem(k));}}catch(e){}
   const blob=new Blob([JSON.stringify(o)],{type:'application/json'});
   const fn='Fiche_Entrees_Sauvegarde_'+new Date().toISOString().slice(0,10)+'.json';
   try{
@@ -441,7 +427,7 @@ $('#dl').addEventListener('click',async()=>{
   $('#mo').value=st.m;$('#yr').value=st.y;
   st.set={...DEF,...(ls.get('ft:set')||{})};if(st.set.sc==='05/09/07'||st.set.sc==='05/10/07')st.set.sc=DEF.sc;
   document.querySelectorAll('[data-set]').forEach(i=>{i.value=st.set[i.dataset.set]||''});
-  st.open=now.getDate();load();render();autoBackupReady=true;
+  st.open=now.getDate();load();render();
   setTimeout(()=>{const e=$('#day'+st.open);if(e)e.scrollIntoView({block:'start'})},80);
 })();
 </script>
