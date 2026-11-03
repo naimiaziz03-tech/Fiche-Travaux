@@ -104,7 +104,7 @@ input:not([type=checkbox]),select{height:44px;box-sizing:border-box}
 </head>
 <body>
 <main>
-<div class="top"><button id="mn" class="ic" aria-label="menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1>Fiche de travaux</h1>
+<div class="top"><button id="mn" class="ic" aria-label="menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1>Fiche de travaux</h1><span id="autosave-ok" aria-label="Sauvegardé" title="Sauvegardé" hidden style="color:#16a34a;font-size:18px;font-weight:800;margin-inline-start:auto">✓</span>
 <div id="menu" hidden><button id="ma">عرض الأشهر السابقة بمدخلاتها</button><button id="mx">حفظ نسخة احتياطية في الهاتف</button><button id="mi">استرجاع نسخة</button></div></div>
 <input type="file" id="imf" accept=".json,application/json" hidden>
 <div id="toast" hidden></div>
@@ -261,10 +261,17 @@ const ls={
 const mk=()=>'ft:'+st.y+'-'+st.m;
 const hd=(d,D)=>hrs(D,new Date(st.y,st.m,+d).getDay());
 const nmv=(d,D)=>rd(hd(d,D)*(spc(D)&&spc(D)[3]?1:(new Date(st.y,st.m,+d).getDay()===0?1.75:1.5)));
-const mv=(d,D)=>isRC(D)?-8.5:(hd(d,D)?nmv(d,D):0);
-function load(){const d=ls.get(mk())||{};st.days=d.days||{};st.ex={};
+const mv=(d,D)=>hd(d,D)?nmv(d,D):0;
+function load(){const d=ls.get(mk())||{};st.days=d.days||{};st.ex=d.ex||{};
   document.querySelectorAll('[data-ex]').forEach(i=>{i.value=st.ex[i.dataset.ex]||''});}
-function save(){ls.set(mk(),{days:st.days,ex:st.ex});ls.set('ft:set',st.set);}
+let autosaveTimer=0;
+function save(){
+  // Persist silently right away; the check appears after 2 seconds without edits.
+  ls.set(mk(),{days:st.days,ex:st.ex});ls.set('ft:set',st.set);
+  const mark=$('#autosave-ok');if(mark)mark.hidden=true;
+  clearTimeout(autosaveTimer);
+  autosaveTimer=setTimeout(()=>{const m=$('#autosave-ok');if(m)m.hidden=false;},2000);
+}
 
 const TOPT=(()=>{const a=[];for(let h=0;h<24;h++)for(const m of['00','30'])a.push(String(h).padStart(2,'0')+':'+m);return a})();
 function tsel(d,k,lab,v){
