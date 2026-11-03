@@ -212,7 +212,7 @@ function fillSheet(xml,y,m,days,ex,set,rm){
   xml=setCell(xml,'R5',set.ss||'');xml=setCell(xml,'S6',set.sk||'');
   xml=setCell(xml,'C8','                Nom et Prénom : '+set.sn+'                        Mle : '+set.sm+'                             Classement : '+set.sc+'    ');
   [['C48','c'],['E48','e'],['G48','g'],['I48','i'],['K48','k']].forEach(([ref,k])=>{xml=setCell(xml,ref,ex[k]||'_')});
-  const rc=num(ex.rc);xml=setCell(xml,'P48',nRC?nRC:(rc==null?(ex.rc||''):rc));
+  const rc=num(ex.rc);xml=setCell(xml,'P48',nRC?nRC*8.5:(rc==null?(ex.rc||''):rc));
   xml=setCell(xml,'N44','Kilométrage:'+(ex.km?' '+ex.km:''));
   xml=setCell(xml,'N45','Puissance fiscale'+(ex.pf?' '+ex.pf:''));
   return xml;
@@ -305,7 +305,7 @@ function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);
   return p.join(' · ')||'—';}
 function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0,r=0,meal=0;
   const prices={c1:40,c2:80,c3:80,c4:130};
-  for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hd(d,D);b+=mv(d,D);if(isRC(D))r++;c+=(D.m&&has(D))?1:0;
+  for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hd(d,D);b+=mv(d,D);if(isRC(D))r+=8.5;c+=(D.m&&has(D))?1:0;
     for(const k in prices)if(D[k])meal+=prices[k];
   }
   $('#tot').innerHTML='<div>NM '+rd(a)+' · M '+rd(b)+' · Panier '+rd(c)+' · RC '+r+'</div><div style="font-size:8px;color:var(--acc);font-weight:700">المجموع: '+rd(meal)+' DH</div><span id="msg"></span>';}
@@ -337,7 +337,7 @@ function preview(){
   const n=new Date(st.y,st.m+1,0).getDate(),T={k:0,l:0,m:0,c1:0,c2:0,c3:0,c4:0},C=['c1','c2','c3','c4'];let rows='';
   for(let d=1;d<=n;d++){
     const D=st.days[d]||{},w=new Date(st.y,st.m,d).getDay(),h=hd(d,D),l=mv(d,D);
-    T.k+=h;T.l+=l;if(isRC(D))T.rc=(T.rc||0)+1;if(D.m)T.m++;C.forEach(c=>{if(D[c])T[c]++});
+    T.k+=h;T.l+=l;if(isRC(D))T.rc=(T.rc||0)+8.5;if(D.m)T.m++;C.forEach(c=>{if(D[c])T[c]++});
     rows+='<tr class="'+(w===0||w===6?'we':'')+(isR(D)||w===0||w===6?' red':'')+'"><td>'+d+'</td><td>'+DOW[w]+'</td>'+[0,1,2,3,4,5,6,7].map(i=>'<td>'+esc(tt(D,i))+'</td>').join('')+'<td>'+(h||'')+'</td><td>'+(l||'')+'</td><td>'+(D.m?1:'')+'</td><td class="tw">'+esc(D.w||'')+'</td><td>'+esc(D.q||'')+'</td>'+C.map(c=>'<td>'+(D[c]?1:'')+'</td>').join('')+'</tr>';
   }
   const th=s=>'<th>'+s+'</th>';
