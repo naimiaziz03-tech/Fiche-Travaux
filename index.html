@@ -60,7 +60,7 @@ button{font:inherit;cursor:pointer}
 .act button{flex:1;padding:9px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
 .act .gh{color:var(--red)}
 .bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px}
-#tot{flex:1;font-size:16px;color:var(--ink);text-align:right;line-height:1.4}
+#tot{flex:1;font-size:12.5px;color:var(--mut)}
 #msg{display:block;margin-top:2px}
 #dl{background:var(--acc);color:var(--accink);border:0;border-radius:12px;padding:12px 16px;font-weight:700}
 #dl:disabled{opacity:.6}
@@ -73,20 +73,11 @@ button{font:inherit;cursor:pointer}
 .pvh button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 14px}
 .pvi{font-size:12px;padding:8px 14px;color:var(--mut);direction:ltr;text-align:left}
 #pvt{flex:1;overflow:auto;background:#fff;color:#000;padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}
-#pvt table{border-collapse:collapse;font-size:12px;min-width:780px;direction:ltr;background:#fff;color:#000}
-#pvt th,#pvt td{border:1px solid #b5b5b5;padding:4px 6px;text-align:center;white-space:nowrap}
-#pvt th{background:#f2f2f2;font-weight:600}
-#pvt td.tw{white-space:normal;min-width:150px;text-align:start}
-#pvt tr.we td:nth-child(2){color:#c00000;font-weight:700}
-#pvt tr.tot td{font-weight:700;background:#f2f2f2}
 .day.rd .dh span,.day.we .dh span{color:var(--red)}
 .day.op{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
 .day.today .dh b{background:var(--acc);color:var(--accink);border-radius:8px;padding:0 6px;min-width:0}
 .sg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.sg:empty{display:none}
 .chip{border:1px solid var(--acc);color:var(--acc);background:transparent;border-radius:999px;padding:5px 12px;font-size:14px}
-#pvt tr.red td{color:#c00000}
-#pvt tr.red:not(.we) td:nth-child(-n+2){color:#000}
-#pvt tr.we td:nth-child(-n+2){color:#c00000;font-weight:700}
 .note{font-size:12.5px;color:var(--mut);margin:4px 2px 12px}
 .ckrow{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink)}
 /* alignment fix */
@@ -99,23 +90,52 @@ input:not([type=checkbox]),select{height:44px;box-sizing:border-box}
 .cks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .cks .ck{margin-top:0;justify-content:center;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
 
-.hidden-field{display:none!important}
+.bar{flex-wrap:wrap;gap:8px 12px}
+#tot{flex:1 1 100%;white-space:nowrap}
+#dl{flex:1}
+#menu small{display:block;padding:6px 12px;color:var(--mut);font-size:12px}
+.zb{display:flex;gap:6px}
+#pm{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+#pm[hidden]{display:none}
+#pml{flex:1;overflow:auto;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
+.mrow{all:unset;box-sizing:border-box;display:block;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:8px;cursor:pointer}
+.mrow b{display:block;font-size:16px}.mrow span{color:var(--mut);font-size:13px}
+#pvt{direction:ltr}
+#pw{margin:8px auto 24px}
+#pp{width:1068px;background:#fff;color:#000;font:11px/1.25 Arial,Helvetica,sans-serif;padding:14px 12px 10px;box-sizing:border-box;border:1px solid #bbb}
+#pp img:not([src]){display:none}
+#pp .ph{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:10px;min-height:92px}
+#pp .pl{text-align:center}
+#pp .pl img{height:34px;display:block;margin:0 auto 6px}
+#pp .pt{font-weight:700;font-size:15px;text-decoration:underline;margin-top:22px;text-align:center;white-space:nowrap}
+#pp .pr img{height:26px;display:block;margin:0 0 8px auto}
+#pp .pr div{margin-left:auto;width:200px}
+#pp .pr b{display:inline-block;min-width:74px}
+#pp .pn{text-align:center;font:700 12px "Times New Roman",serif;margin:6px 0 10px;white-space:pre-wrap}
+#pp table{border-collapse:collapse;table-layout:fixed;width:100%}
+#pp th,#pp td{border:1px solid #000;text-align:center;padding:0 3px;height:21px;overflow:hidden;white-space:nowrap;font-weight:400;line-height:1.2}
+#pp th{height:auto;padding:2px 3px;font-size:10px;white-space:normal;line-height:1.15}
+#pp th.v{writing-mode:vertical-rl;padding:4px 2px}
+#pp td.tw{white-space:normal;font-size:10px;line-height:1.1}
+#pp td.l{text-align:left}
+#pp td:nth-child(2){font-weight:700}
+#pp tr.red td{color:#c00000}
+#pp tr.red:not(.we) td:nth-child(-n+2){color:#000}
+#pp tr.we td:nth-child(-n+2){color:#c00000}
+#pp .typo{display:flex;justify-content:space-between;margin:10px 0 3px}
+#pp .typo span:first-child{text-decoration:underline}
+#pp .ty{width:860px}
+#pp .ty th{white-space:normal}
+#pp .sig{display:flex;justify-content:space-between;width:900px;margin:8px 0 0 30px}
+#pp .ft{text-align:right;margin-top:4px;font-size:9px}
 </style>
 </head>
 <body>
 <main>
-<div class="top"><button id="mn" class="ic" aria-label="menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1>Fiche de travaux</h1><span id="autosave-ok" aria-label="Sauvegardé" title="Sauvegardé" hidden style="color:#16a34a;font-size:18px;font-weight:800;margin-inline-start:auto">✓</span>
-<div id="menu" hidden><button id="ma">عرض الأشهر السابقة بمدخلاتها</button><button id="mx">حفظ نسخة احتياطية في الهاتف</button><button id="mi">استرجاع نسخة</button></div></div>
+<div class="top"><button id="mn" class="ic" aria-label="menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1>Fiche de travaux</h1>
+<div id="menu" hidden><button id="mprev">الأشهر السابقة ومدخلاتها</button><button id="ms">حفظ نسخة في الهاتف</button><button id="mx">إرسال / مشاركة نسخة</button><button id="mi">استرجاع نسخة</button><small id="cl"></small></div></div>
 <input type="file" id="imf" accept=".json,application/json" hidden>
 <div id="toast" hidden></div>
-<div id="archive" hidden style="position:fixed;inset:0;z-index:25;background:var(--bg);padding:20px;overflow:auto">
-  <div class="card" style="max-width:520px;margin:20px auto">
-    <h3 style="margin-top:0">الأشهر السابقة المحفوظة</h3>
-    <p class="sub">اختار الشهر باش تشوف المدخلات ديالو. البيانات كتتحفظ تلقائياً فهاد الهاتف.</p>
-    <label>الشهر<select id="archivemo"></select></label>
-    <div class="act"><button id="archivego">عرض المدخلات</button><button id="archiveclose">إغلاق</button></div>
-  </div>
-</div>
 <p class="sub">أدخل معلومات كل يوم، والتطبيق يملأ لك ملف Excel بنفس تنسيق نموذجك.</p>
 
 <section class="card row" dir="ltr">
@@ -129,9 +149,10 @@ input:not([type=checkbox]),select{height:44px;box-sizing:border-box}
 <label>Nom et Prénom<input data-set="sn" dir="auto"></label>
 <label>Mle<input data-set="sm" dir="auto"></label>
 <label>Classement<input data-set="sc" dir="auto"></label>
-<label class="hidden-field">Service<input data-set="ss" dir="auto"></label>
+<label>Service<input data-set="ss" dir="auto"></label>
 </div>
-<label class="hidden-field" style="margin-top:8px">Code Etbl<input data-set="sk" dir="auto"></label>
+<label style="margin-top:8px">Code Etbl<input data-set="sk" dir="auto"></label>
+<label style="margin-top:8px">اسم ملف النسخة الاحتياطية (بدون الامتداد)<input data-set="bf" dir="ltr"></label>
 </details>
 
 <div id="list"></div>
@@ -144,7 +165,8 @@ input:not([type=checkbox]),select{height:44px;box-sizing:border-box}
 <button id="pvb">عرض الملف</button>
 <button id="dl">تنزيل ملف Excel</button>
 </footer>
-<div id="pv" hidden><div class="pvh"><b>معاينة الملف</b><button id="pvx">إغلاق</button></div><div class="pvi" id="pvi"></div><div id="pvt"></div></div>
+<div id="pv" hidden><div class="pvh"><b>معاينة الملف</b><span class="zb"><button id="pz0">−</button><button id="pz1">+</button><button id="pzf">ملاءمة</button></span><button id="pvx">إغلاق</button></div><div id="pvt"></div></div>
+<div id="pm" hidden><div class="pvh"><b>الأشهر السابقة</b><button id="pmx">إغلاق</button></div><div id="pml"></div></div>
 
 <script>/*!
 
@@ -180,8 +202,7 @@ function setCell(xml,ref,val,style){
 function setCalc(xml,ref,v){
   return xml.replace(new RegExp('(<c r="'+ref+'"[^>]*>\\s*<f>[^<]*</f>\\s*<v>)[^<]*(</v>)'),'$1'+v+'$2');
 }
-function isTC(D){return /travaux\s*au\s*centre/i.test(String(D.w||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''))}
-function hrs(D,wd){if(isC(D)||isTC(D))return 0;let s=0;for(let i=0;i<8;i+=2){const a=g(D,i),b=g(D,i+1);if(a&&b){const sm=(+a.slice(0,2))*60+(+a.slice(3,5));let em=(+b.slice(0,2))*60+(+b.slice(3,5));if(em<sm)em+=1440;s+=Math.max(0,em-(wd===0||wd===6?sm:Math.max(sm,1020)))}}return rd(s/60)}
+function hrs(D,wd){if(isC(D))return 0;let s=0;for(let i=0;i<8;i+=2){const a=g(D,i),b=g(D,i+1);if(a&&b){const sm=(+a.slice(0,2))*60+(+a.slice(3,5));let em=(+b.slice(0,2))*60+(+b.slice(3,5));if(em<sm)em+=1440;s+=Math.max(0,em-(wd===0||wd===6?sm:Math.max(sm,1020)))}}return rd(s/60)}
 const fh=t=>t?String(t).replace(':','h'):'';
 const SP=[[/conge\s*an+u[ae]?l/,'C','A',0,1],[/repos\s*statut/,'R','S',0,1],[/repos\s*compens/,'R','C',0,1,1],[/jour\s*feri/,'J','F',0,1],[/travaux\s*au\s*centre/,'08h00','16h30',1]];
 const spc=D=>{const s=String(D.w||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return SP.find(p=>p[0].test(s))||null};
@@ -212,7 +233,7 @@ function fillSheet(xml,y,m,days,ex,set,rm){
   xml=setCell(xml,'R5',set.ss||'');xml=setCell(xml,'S6',set.sk||'');
   xml=setCell(xml,'C8','                Nom et Prénom : '+set.sn+'                        Mle : '+set.sm+'                             Classement : '+set.sc+'    ');
   [['C48','c'],['E48','e'],['G48','g'],['I48','i'],['K48','k']].forEach(([ref,k])=>{xml=setCell(xml,ref,ex[k]||'_')});
-  const rc=num(ex.rc);xml=setCell(xml,'P48',nRC?nRC*8.5:(rc==null?(ex.rc||''):rc));
+  const rc=num(ex.rc);xml=setCell(xml,'P48',nRC?nRC:(rc==null?(ex.rc||''):rc));
   xml=setCell(xml,'N44','Kilométrage:'+(ex.km?' '+ex.km:''));
   xml=setCell(xml,'N45','Puissance fiscale'+(ex.pf?' '+ex.pf:''));
   return xml;
@@ -252,7 +273,7 @@ function stripVisa(dx){
 //</core>
 
 const $=s=>document.querySelector(s);
-const DEF={sn:'NAIMI AZIZ',sm:'83684 L',sc:'05/10/09',ss:':Maintenence TAZA',sk:' :ITOF R1P1'};
+const DEF={sn:'NAIMI AZIZ',sm:'83684 L',sc:'05/10/09',bf:'Fiche_Travaux_Sauvegarde',ss:':Maintenence TAZA',sk:' :ITOF R1P1'};
 const st={y:0,m:0,days:{},ex:{},set:{...DEF},open:0};
 const ls={
   get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
@@ -261,17 +282,10 @@ const ls={
 const mk=()=>'ft:'+st.y+'-'+st.m;
 const hd=(d,D)=>hrs(D,new Date(st.y,st.m,+d).getDay());
 const nmv=(d,D)=>rd(hd(d,D)*(spc(D)&&spc(D)[3]?1:(new Date(st.y,st.m,+d).getDay()===0?1.75:1.5)));
-const mv=(d,D)=>hd(d,D)?nmv(d,D):0;
-function load(){const d=ls.get(mk())||{};st.days=d.days||{};st.ex=d.ex||{};
+const mv=(d,D)=>isRC(D)?-8.5:(hd(d,D)?nmv(d,D):0);
+function load(){const d=ls.get(mk())||{};st.days=d.days||{};st.ex={};
   document.querySelectorAll('[data-ex]').forEach(i=>{i.value=st.ex[i.dataset.ex]||''});}
-let autosaveTimer=0;
-function save(){
-  // Persist silently right away; the check appears after 2 seconds without edits.
-  ls.set(mk(),{days:st.days,ex:st.ex});ls.set('ft:set',st.set);
-  const mark=$('#autosave-ok');if(mark)mark.hidden=true;
-  clearTimeout(autosaveTimer);
-  autosaveTimer=setTimeout(()=>{const m=$('#autosave-ok');if(m)m.hidden=false;},2000);
-}
+function save(){ls.set(mk(),{days:st.days,ex:st.ex,upd:Date.now()});ls.set('ft:set',st.set);cloudPush();}
 
 const TOPT=(()=>{const a=[];for(let h=0;h<24;h++)for(const m of['00','30'])a.push(String(h).padStart(2,'0')+':'+m);return a})();
 function tsel(d,k,lab,v){
@@ -303,12 +317,8 @@ function sum(d){const D=st.days[d]||{},p=[];if(D.w)p.push(D.w);
   
   
   return p.join(' · ')||'—';}
-function totals(){const n=new Date(st.y,st.m+1,0).getDate();let a=0,b=0,c=0,r=0,meal=0;
-  const prices={c1:40,c2:80,c3:80,c4:130};
-  for(let d=1;d<=n;d++){const D=st.days[d]||{};a+=hd(d,D);b+=mv(d,D);if(isRC(D))r+=8.5;c+=(D.m&&has(D))?1:0;
-    for(const k in prices)if(D[k])meal+=prices[k];
-  }
-  $('#tot').innerHTML='<div>NM '+rd(a)+' · M '+rd(b)+' · Panier '+rd(c)+' · RC '+r+'</div><div style="font-size:8px;color:var(--acc);font-weight:700">المجموع: '+rd(meal)+' DH</div><span id="msg"></span>';}
+function totals(){const T=mtot(st.y,st.m,st.days);
+  $('#tot').innerHTML='NM '+rd(T.a)+' · M '+rd(T.b)+' · Panier '+T.c+' · RC '+T.r+' · Dépl. '+rd(T.dep)+'<span id="msg"></span>';}
 function render(){const n=new Date(st.y,st.m+1,0).getDate(),nw=new Date(),tdy=(nw.getFullYear()===st.y&&nw.getMonth()===st.m)?nw.getDate():0;let h='';
   for(let d=1;d<=n;d++){const w=new Date(st.y,st.m,d).getDay(),we=w===0||w===6;
     h+=`<div class="day${we?' we':''}${isR(st.days[d]||{})?' rd':''}${st.open===d?' op':''}${d===tdy?' today':''}" id="day${d}"><button class="dh" data-open="${d}"><b>${d}</b><i>${DOW[w]}</i><span id="sm${d}">${esc(sum(d))}</span></button>${st.open===d?form(d):''}</div>`;}
@@ -333,24 +343,98 @@ document.addEventListener('input',e=>{const t=e.target,ds=t.dataset;
 function changeMonth(){const y=+$('#yr').value;if(!y)return;st.y=y;st.m=+$('#mo').value;const t=new Date();st.open=(t.getFullYear()===st.y&&t.getMonth()===st.m)?t.getDate():0;load();render();if(st.open)$('#day'+st.open).scrollIntoView({block:'start'});}
 $('#mo').addEventListener('change',changeMonth);$('#yr').addEventListener('change',changeMonth);
 
-function preview(){
-  const n=new Date(st.y,st.m+1,0).getDate(),T={k:0,l:0,m:0,c1:0,c2:0,c3:0,c4:0},C=['c1','c2','c3','c4'];let rows='';
-  for(let d=1;d<=n;d++){
-    const D=st.days[d]||{},w=new Date(st.y,st.m,d).getDay(),h=hd(d,D),l=mv(d,D);
-    T.k+=h;T.l+=l;if(isRC(D))T.rc=(T.rc||0)+8.5;if(D.m)T.m++;C.forEach(c=>{if(D[c])T[c]++});
-    rows+='<tr class="'+(w===0||w===6?'we':'')+(isR(D)||w===0||w===6?' red':'')+'"><td>'+d+'</td><td>'+DOW[w]+'</td>'+[0,1,2,3,4,5,6,7].map(i=>'<td>'+esc(tt(D,i))+'</td>').join('')+'<td>'+(h||'')+'</td><td>'+(l||'')+'</td><td>'+(D.m?1:'')+'</td><td class="tw">'+esc(D.w||'')+'</td><td>'+esc(D.q||'')+'</td>'+C.map(c=>'<td>'+(D[c]?1:'')+'</td>').join('')+'</tr>';
+const RATE={c1:40,c2:80,c3:80,c4:130};
+function mtot(y,m,days){
+  const n=new Date(y,m+1,0).getDate(),T={a:0,b:0,c:0,r:0,dep:0,cnt:0};
+  for(let d=1;d<=n;d++){const D=days[d]||{},w=new Date(y,m,d).getDay(),hh=hrs(D,w);
+    if(has(D))T.cnt++;
+    T.a+=hh;T.b+=isRC(D)?-8.5:(hh?rd(hh*(spc(D)&&spc(D)[3]?1:(w===0?1.75:1.5))):0);
+    if(isRC(D))T.r++;if(D.m&&has(D))T.c++;
+    for(const k in RATE)if(D[k])T.dep+=RATE[k];}
+  return T;
+}
+let LOGOS=null;
+async function logos(){
+  if(LOGOS)return LOGOS;LOGOS=[];
+  try{
+    const z=await JSZip.loadAsync(TPL,{base64:true});
+    const d=await z.file('xl/drawings/drawing1.xml').async('string');
+    const r=await z.file('xl/drawings/_rels/drawing1.xml.rels').async('string');
+    const map={};r.replace(/<Relationship [^>]*?Id="(rId\d+)"[^>]*?Target="([^"]+)"/g,(x,i,t)=>{map[i]=t;return x});
+    const pics=[];
+    d.replace(/<xdr:twoCellAnchor[\s\S]*?<\/xdr:twoCellAnchor>/g,a=>{
+      if(!a.includes('<xdr:pic'))return a;
+      const f=a.match(/<xdr:from><xdr:col>(\d+)<\/xdr:col>[\s\S]*?<xdr:row>(\d+)<\/xdr:row>/),e=a.match(/r:embed="(rId\d+)"/);
+      if(f&&e&&+f[2]<=2&&map[e[1]])pics.push({c:+f[1],t:map[e[1]]});return a;});
+    pics.sort((a,b)=>a.c-b.c);
+    for(const q of pics){const nm='xl/'+q.t.replace('../','');const bl=await z.file(nm).async('blob');
+      LOGOS.push(URL.createObjectURL(new Blob([bl],{type:/png$/i.test(nm)?'image/png':'image/jpeg'})));}
+  }catch(e){}
+  return LOGOS;
+}
+function pvHtml(){
+  const y=st.y,m=st.m,n=new Date(y,m+1,0).getDate(),T=mtot(y,m,st.days),C=['c1','c2','c3','c4'],cn={c1:0,c2:0,c3:0,c4:0};
+  let rows='';
+  for(let d=1;d<=31;d++){
+    if(d>n){rows+='<tr>'+'<td></td>'.repeat(20)+'</tr>';continue;}
+    const D=st.days[d]||{},w=new Date(y,m,d).getDay(),we=w===0||w===6,hh=hd(d,D),l=mv(d,D);
+    C.forEach(c=>{if(D[c])cn[c]++});
+    rows+='<tr class="'+(we?'we ':'')+((we||isR(D))?'red':'')+'"><td>'+d+'</td><td>'+DOW[w]+'</td>'+[0,1,2,3,4,5,6,7].map(i=>'<td>'+esc(tt(D,i))+'</td>').join('')+'<td>'+(hh||'')+'</td><td>'+(l||'')+'</td><td>'+(D.m?1:'')+'</td><td class="tw">'+esc(D.w||'')+'</td><td>'+esc(D.q||'')+'</td>'+C.map(c=>'<td>'+(D[c]?1:'')+'</td>').join('')+'<td></td></tr>';
   }
-  const th=s=>'<th>'+s+'</th>';
-  const head='<tr>'+th('Date')+th('Jour')+'<th colspan="4">Jour (5h–21h)</th><th colspan="4">Nuit (21h–5h)</th>'+th('NM')+th('M')+th('Panier')+th('Travaux effectués')+th('Frais')+'<th colspan="4">Déplacement</th></tr><tr>'+th('')+th('')+['de','à','de','à','de','à','de','à'].map(x=>th(x)).join('')+th('')+th('')+th('')+th('')+th('')+['P.Déj','Déj','Din','Déc'].map(x=>th(x)).join('')+'</tr>';
-  const tot='<tr class="tot"><td colspan="10">Total</td><td>'+rd(T.k)+'</td><td>'+rd(T.l)+'</td><td>'+T.m+'</td><td></td><td></td>'+C.map(c=>'<td>'+T[c]+'</td>').join('')+'</tr>';
-  $('#pvi').textContent=MONTHS[st.m]+' '+st.y+' · '+(st.set.sn||'')+' · Mle '+(st.set.sm||'')+' · Classement '+(st.set.sc||'')+' · Total RC '+(T.rc||0);
-  $('#pvt').innerHTML='<table><thead>'+head+'</thead><tbody>'+rows+tot+'</tbody></table>';
-  $('#pv').hidden=false;if(!(history.state&&history.state.pv)){try{history.pushState({pv:1},'')}catch(e){}}
+  const cg='<colgroup>'+[30,30,46,46,46,46,46,46,46,46,44,44,36,230,56,36,36,36,36,56].map(w=>'<col style="width:'+w+'px">').join('')+'</colgroup>';
+  const head='<tr><th rowspan="3" class="v">Date</th><th rowspan="3" class="v">Jour</th><th colspan="8">Horaire de Travail</th><th colspan="2">Total HS</th><th rowspan="3" class="v">Panier</th><th rowspan="3">Travaux effectués</th><th rowspan="3">Frais de voyage</th><th colspan="4">Déplacement</th><th rowspan="3">Visa chef direct</th></tr>'
+   +'<tr><th colspan="4">Jour (5h, 21h)</th><th colspan="4">Nuit (21h, 5h)</th><th rowspan="2">NM</th><th rowspan="2">M</th><th rowspan="2">P.Déj</th><th rowspan="2">Déj</th><th rowspan="2">Din</th><th rowspan="2">Déc</th></tr>'
+   +'<tr>'+['de','à','de','à','de','à','de','à'].map(x=>'<th>'+x+'</th>').join('')+'</tr>';
+  const tot='<tr class="tt"><td colspan="10" class="l">Total</td><td>'+rd(T.a)+'</td><td>'+rd(T.b)+'</td><td>'+T.c+'</td><td class="l">Kilométrage:</td><td></td>'+C.map(c=>'<td>'+cn[c]+'</td>').join('')+'<td></td></tr>';
+  const cl=s=>String(s||'').replace(/^[\s:]+/,'');
+  const ty='<table class="ty"><tr><th>HS</th><th colspan="4">Hors Permanence</th><th rowspan="2">Permanence</th><th rowspan="2">Total HS majorées</th><th rowspan="2">Total HS non majorées</th><th rowspan="2">Total RC</th></tr>'
+   +'<tr><th>Travaux</th><th>Maint./I.P</th><th>Week-end</th><th>Trajet</th><th>Conduit</th></tr>'
+   +'<tr><td>Total</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>'+rd(T.b)+'</td><td>'+rd(T.a)+'</td><td>'+(T.r||'')+'</td></tr></table>';
+  return '<div id="pp"><div class="ph"><div class="pl"><img id="lg1" alt="">Pôle Industriel<br>Direction Transport Région Orientale<br>Division Exploitation Transport Fès</div>'
+   +'<div class="pt">FICHE DE  TRAVAUX</div>'
+   +'<div class="pr"><img id="lg2" alt=""><div><b>Mois</b> '+esc(MONTHS[m]+' '+y)+'</div><div><b>Service</b> '+esc(cl(st.set.ss))+'</div><div><b>Code Etbl</b> '+esc(cl(st.set.sk))+'</div></div></div>'
+   +'<div class="pn">Nom et Prénom : '+esc(st.set.sn||'')+'        Mle : '+esc(st.set.sm||'')+'        Classement : '+esc(st.set.sc||'')+'</div>'
+   +'<table>'+cg+'<thead>'+head+'</thead><tbody>'+rows+tot+'</tbody></table>'
+   +'<div class="typo"><span>Typologie des HS</span><span>Puissance fiscale</span></div>'+ty
+   +'<div class="sig"><span>Signature de l\u2019Agent</span><span>Chef de Section</span><span>Chef de Service</span></div><div class="ft">FDT/V0/11/06</div></div>';
+}
+let PZ=1;
+function zApply(){const p=$('#pp'),w=$('#pw');if(!p||!w)return;p.style.transform='scale('+PZ+')';p.style.transformOrigin='0 0';w.style.width=Math.round(1068*PZ)+'px';w.style.height=Math.round(p.offsetHeight*PZ)+'px';}
+function zFit(){const c=$('#pvt');PZ=Math.min(1,Math.max(.2,(c.clientWidth-16)/1068));zApply();}
+function pushPv(){if(!(history.state&&history.state.pv)){try{history.pushState({pv:1},'')}catch(e){}}}
+async function preview(){
+  $('#pvt').innerHTML='<div id="pw">'+pvHtml()+'</div>';
+  $('#pv').hidden=false;pushPv();zFit();
+  const L=await logos(),a=$('#lg1'),b=$('#lg2');
+  if(a&&L[0])a.src=L[0];if(b&&L[1])b.src=L[1];
+  zApply();
 }
 $('#pvb').addEventListener('click',preview);
-function closePv(){if(history.state&&history.state.pv){history.back();}else{$('#pv').hidden=true;}}
-$('#pvx').addEventListener('click',closePv);
-window.addEventListener('popstate',()=>{$('#pv').hidden=true});
+$('#pz0').addEventListener('click',()=>{PZ=Math.max(.2,PZ/1.25);zApply()});
+$('#pz1').addEventListener('click',()=>{PZ=Math.min(2.5,PZ*1.25);zApply()});
+$('#pzf').addEventListener('click',zFit);
+function closePv(){if(history.state&&history.state.pv){history.back();}else{$('#pv').hidden=true;$('#pm').hidden=true;}}
+$('#pvx').addEventListener('click',closePv);$('#pmx').addEventListener('click',closePv);
+window.addEventListener('popstate',()=>{$('#pv').hidden=true;$('#pm').hidden=true});
+
+function monthsList(){
+  const out=[];
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i),q=k&&k.match(/^ft:(\d+)-(\d+)$/);if(!q)continue;
+    const o=ls.get(k)||{},T=mtot(+q[1],+q[2],o.days||{});if(T.cnt)out.push({y:+q[1],mo:+q[2],T});}}catch(e){}
+  out.sort((a,b)=>(b.y*12+b.mo)-(a.y*12+a.mo));return out;
+}
+function openPrev(){
+  const L=monthsList();
+  $('#pml').innerHTML=L.length?L.map(x=>'<button class="mrow" data-ym="'+x.y+'-'+x.mo+'"><b>'+MONTHS[x.mo]+' '+x.y+'</b><span>'+x.T.cnt+' يوم · NM '+rd(x.T.a)+' · M '+rd(x.T.b)+' · Panier '+x.T.c+' · RC '+x.T.r+' · Dépl. '+rd(x.T.dep)+'</span></button>').join(''):'<p class="note">لا توجد أشهر محفوظة بعد.</p>';
+  $('#pm').hidden=false;pushPv();
+}
+$('#mprev').addEventListener('click',()=>{$('#menu').hidden=true;openPrev();});
+$('#pml').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ym]');if(!b)return;
+  const q=b.dataset.ym.split('-').map(Number);
+  $('#mo').value=q[1];$('#yr').value=q[0];changeMonth();closePv();window.scrollTo(0,0);
+});
+
 
 function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.hidden=true},2800);}
 $('#mn').addEventListener('click',()=>{$('#menu').hidden=!$('#menu').hidden});
@@ -360,27 +444,18 @@ async function saveBlob(blob,fn){
   if(dl){await dl.save({filename:fn,data:blob});}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();}
 }
-$('#ma').addEventListener('click',()=>{
-  $('#menu').hidden=true;
-  const sel=$('#archivemo');const opts=[];
-  const now=new Date();
-  for(let i=0;i<36;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1),key='ft:'+d.getFullYear()+'-'+d.getMonth();
-    if(i===0||ls.get(key)){opts.push({y:d.getFullYear(),m:d.getMonth(),label:MONTHS[d.getMonth()]+' '+d.getFullYear(),key});}}
-  sel.innerHTML=opts.map(o=>`<option value="${o.y}-${o.m}">${o.label}${ls.get(o.key)?' ✓':''}</option>`).join('');
-  $('#archive').hidden=false;
-});
-$('#archiveclose').addEventListener('click',()=>$('#archive').hidden=true);
-$('#archivego').addEventListener('click',()=>{
-  const v=$('#archivemo').value.split('-');if(v.length!==2)return;
-  st.y=+v[0];st.m=+v[1];$('#yr').value=st.y;$('#mo').value=st.m;
-  st.open=0;load();render();$('#archive').hidden=true;window.scrollTo(0,0);
-});
-$('#mx').addEventListener('click',async()=>{
-  $('#menu').hidden=true;
+function backupFile(){
   const o={app:'fiche-travaux',v:1,at:new Date().toISOString(),data:{}};
   try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ft:'))o.data[k]=JSON.parse(localStorage.getItem(k));}}catch(e){}
-  const blob=new Blob([JSON.stringify(o)],{type:'application/json'});
-  const fn='Fiche_Entrees_Sauvegarde_'+new Date().toISOString().slice(0,10)+'.json';
+  const nm=(st.set.bf||DEF.bf).trim().replace(/[^\w.-]+/g,'_')||DEF.bf;
+  return {blob:new Blob([JSON.stringify(o)],{type:'application/json'}),fn:nm+'.json'};
+}
+$('#ms').addEventListener('click',async()=>{
+  $('#menu').hidden=true;const {blob,fn}=backupFile();
+  try{await saveBlob(blob,fn);toast('تم حفظ النسخة في الهاتف: '+fn);}catch(e){toast(e&&e.code==='declined'?'أُلغي الحفظ':'تعذّر حفظ النسخة');}
+});
+$('#mx').addEventListener('click',async()=>{
+  $('#menu').hidden=true;const {blob,fn}=backupFile();
   try{
     const f=new File([blob],fn,{type:'application/json'});
     if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Fiche de travaux'});return;}
@@ -428,14 +503,59 @@ $('#dl').addEventListener('click',async()=>{
   b.disabled=false;
 });
 
+const CL={ok:false,coll:null,tm:{},last:''};
+function setCl(t){const e=$('#cl');if(e)e.textContent=t;}
+function cloudPush(){
+  if(!CL.ok)return;
+  const y=st.y,m=st.m,key=y+'_'+m,days=JSON.parse(JSON.stringify(st.days)),set={...st.set};
+  clearTimeout(CL.tm[key]);
+  CL.tm[key]=setTimeout(async()=>{
+    try{
+      const exp=new Date(y,m+1,0,23,59,59).getTime()+7*864e5;
+      if(Date.now()>exp)return;
+      const doc=CL.coll.doc('m_'+key);
+      if(Object.keys(days).some(k=>has(days[k])))await doc.set({y,m,days,upd:Date.now(),exp});else await doc.delete();
+      const sj=JSON.stringify(set);
+      if(sj!==CL.last){await CL.coll.doc('set').set({set,upd:Date.now()});CL.last=sj;}
+      setCl('السحابة: تم الحفظ ✓');
+    }catch(e){setCl('السحابة: تعذّر الحفظ');}
+  },2000);
+}
+async function cloudPull(){
+  const snap=await CL.coll.get(),now=Date.now();let changed=false;
+  for(const s of snap.docs){
+    const d=s.data()||{};
+    if(s.id==='set'){
+      if(!ls.get('ft:set')&&d.set){ls.set('ft:set',d.set);st.set={...DEF,...d.set};
+        document.querySelectorAll('[data-set]').forEach(i=>{i.value=st.set[i.dataset.set]||''});changed=true;}
+      CL.last=JSON.stringify(d.set||{});continue;
+    }
+    if(d.exp&&d.exp<now){try{await CL.coll.doc(s.id).delete();}catch(e){}continue;}
+    if(typeof d.y!=='number'||typeof d.m!=='number'||!d.days)continue;
+    const key='ft:'+d.y+'-'+d.m,loc=ls.get(key);
+    if(!loc||(loc.upd||0)<(d.upd||0)){ls.set(key,{days:d.days,ex:{},upd:d.upd});changed=true;}
+  }
+  if(changed){load();render();}
+}
+async function cloudInit(){
+  try{
+    if(!window.claude){setCl('السحابة: غير متاحة في هذه النسخة');return;}
+    const db=await window.claude.use('db'),u=await window.claude.use('user');
+    if(!db||!u){setCl('السحابة: غير متاحة');return;}
+    const id=await u.id();if(!id){setCl('السحابة: غير متاحة');return;}
+    CL.coll=db.collection('data/users/'+id+'/fiche');CL.ok=true;
+    await cloudPull();setCl('السحابة: متصلة ✓ (تُحفظ كل شهر حتى 7 أيام بعد نهايته)');
+  }catch(e){setCl('السحابة: غير متاحة');}
+}
 (function init(){
   const now=new Date();st.y=now.getFullYear();st.m=now.getMonth();
   $('#mo').innerHTML=MONTHS.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
   $('#mo').value=st.m;$('#yr').value=st.y;
-  st.set={...DEF,...(ls.get('ft:set')||{})};if(st.set.sc==='05/09/07'||st.set.sc==='05/10/07')st.set.sc=DEF.sc;
+  st.set={...DEF,...(ls.get('ft:set')||{})};if(['05/09/07','05/10/07'].includes(st.set.sc))st.set.sc=DEF.sc;
   document.querySelectorAll('[data-set]').forEach(i=>{i.value=st.set[i.dataset.set]||''});
   st.open=now.getDate();load();render();
   setTimeout(()=>{const e=$('#day'+st.open);if(e)e.scrollIntoView({block:'start'})},80);
+  cloudInit();
 })();
 </script>
 </body>
